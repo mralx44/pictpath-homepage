@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PictPath - Capture, Map & Share Your Adventures</title>
-  <meta name="description" content="PictPath tracks your route with GPS and lets you take geo-tagged photos along the way. Share your hiking trips, road trips, and adventures with an interactive map.">
-  <meta name="keywords" content="GPS tracker, photo map, hiking app, trip tracker, geo-tagged photos, share adventures, route tracking, outdoor app">
+  <title>PictPath - GPS Trip Tracker with Geo-tagged Photos | Free Download</title>
+  <meta name="description" content="PictPath is the ultimate GPS trip tracker app. Capture geo-tagged photos, record your hiking routes, road trips and bike rides. Share interactive maps with friends. Free for Android!">
+  <meta name="keywords" content="GPS tracker app, photo map, hiking tracker, trip tracker app, geo-tagged photos, share hiking trips, route tracking app, outdoor adventure app, travel photo map, GPS photo app, road trip tracker, bike route tracker, free GPS app">
   <meta name="author" content="PictPath">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://pictpath.com">
+  
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#0d4532">
+  <meta name="application-name" content="PictPath">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PictPath">
   
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,16 +28,20 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pictpath.com">
-  <meta property="og:title" content="PictPath - Capture, Map & Share Your Adventures">
-  <meta property="og:description" content="Track your route with GPS, take geo-tagged photos, and share your adventures with an interactive map.">
-  <meta property="og:image" content="https://pictpath.com/Logo-Pictpath.png">
+  <meta property="og:title" content="PictPath - GPS Trip Tracker with Geo-tagged Photos">
+  <meta property="og:description" content="Track your hiking routes, capture geo-tagged photos, and share interactive trip maps with friends. Free GPS tracker app for Android!">
+  <meta property="og:image" content="https://pictpath.com/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="PictPath">
+  <meta property="og:locale" content="en_US">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PictPath - Capture, Map & Share Your Adventures">
-  <meta name="twitter:description" content="Track your route with GPS, take geo-tagged photos, and share your adventures with an interactive map.">
-  <meta name="twitter:image" content="https://pictpath.com/Logo-Pictpath.png">
+  <meta name="twitter:title" content="PictPath - GPS Trip Tracker with Geo-tagged Photos">
+  <meta name="twitter:description" content="Track your hiking routes, capture geo-tagged photos, and share interactive trip maps with friends. Free GPS tracker app!">
+  <meta name="twitter:image" content="https://pictpath.com/og-preview.png">
+  <meta name="twitter:creator" content="@pictpath">
   
   <!-- Structured Data for Google -->
   <script type="application/ld+json">
@@ -39,11 +51,12 @@
     "name": "PictPath",
     "operatingSystem": "Android",
     "applicationCategory": "TravelApplication",
-    "description": "PictPath tracks your route with GPS and lets you take geo-tagged photos along the way. Share your hiking trips, road trips, and adventures with an interactive map.",
+    "description": "PictPath is the ultimate GPS trip tracker app. Capture geo-tagged photos along your hiking routes, road trips, and bike rides. Share interactive maps with friends and family.",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "USD",
+      "description": "Free to download with optional Premium subscription"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -52,10 +65,55 @@
     },
     "url": "https://pictpath.com",
     "image": "https://pictpath.com/Logo-Pictpath.png",
+    "screenshot": "https://pictpath.com/Screenshot_20251223_194443_PicPath.jpg",
     "author": {
       "@type": "Organization",
-      "name": "PictPath"
-    }
+      "name": "PictPath",
+      "url": "https://pictpath.com"
+    },
+    "downloadUrl": "https://play.google.com/store/apps/details?id=com.mralx44.pictpath"
+  }
+  </script>
+  
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is PictPath free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! PictPath is free to download and use. All core features like GPS tracking, photo capture, and trip sharing are completely free. Optional Premium removes ads for just $0.99/month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does PictPath work without internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! PictPath works completely offline. GPS tracking and photo capture work without internet. Your trips sync automatically when you're back online."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I share my trips?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "After finishing a trip, tap the share button to generate a unique link. Anyone with the link can view your route and photos on an interactive map - no app needed!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is PictPath available for iPhone?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PictPath is currently available for Android. iOS version is coming soon! Sign up for our newsletter to be notified when it launches."
+        }
+      }
+    ]
   }
   </script>
 </head>
@@ -207,7 +265,7 @@
   <section class="download" id="download">
     <div class="container">
       <h2>Download PictPath</h2>
-      <p class="download-subtitle">Free to download and use. No subscription required.</p>
+      <p class="download-subtitle">Free to download. Optional Premium for ad-free experience.</p>
       
       <div class="download-buttons">
         <a href="https://play.google.com/store/apps/details?id=com.mralx44.pictpath" class="store-button google-play" target="_blank">
@@ -228,6 +286,51 @@
             <span class="store-subtitle">Coming soon to</span>
             <span class="store-name">App Store</span>
           </div>
+        </div>
+      </div>
+      
+      <!-- Premium info -->
+      <div class="premium-info">
+        <h3>✨ PictPath Premium</h3>
+        <p>Love the app? Go Premium for just <strong>$0.99/month</strong> and enjoy:</p>
+        <ul class="premium-features">
+          <li>🚫 No ads - completely distraction-free</li>
+          <li>❤️ Support continued development</li>
+          <li>🎯 Same great features, better experience</li>
+        </ul>
+        <p class="premium-note">All core features remain free forever!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Is PictPath free to use?</h3>
+          <p>Yes! PictPath is completely free to download and use. All core features including GPS tracking, photo capture, and trip sharing are free. Optional Premium ($0.99/month) removes ads.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Does it work without internet?</h3>
+          <p>Absolutely! PictPath works fully offline. GPS tracking and photo capture work without internet connection. Your trips automatically sync when you're back online.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do I share my trips?</h3>
+          <p>After finishing a trip, tap the share button to generate a unique link. Anyone with the link can view your route and photos on an interactive map - no app needed!</p>
+        </div>
+        <div class="faq-item">
+          <h3>How much battery does it use?</h3>
+          <p>PictPath is optimized for battery efficiency. GPS tracking runs in the background with minimal impact. We recommend carrying a power bank for day-long adventures.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is my data private?</h3>
+          <p>Your trips are stored locally on your device. When you share a trip, only people with the link can see it. You're always in control of what you share.</p>
+        </div>
+        <div class="faq-item">
+          <h3>When is the iOS version coming?</h3>
+          <p>We're working hard on the iOS version! It's coming soon. Follow us for updates or check back regularly for the launch announcement.</p>
         </div>
       </div>
     </div>

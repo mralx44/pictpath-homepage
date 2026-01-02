@@ -492,13 +492,23 @@ body {
 }
 
 .store-button.coming-soon {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: default;
+  position: relative;
+  border: 2px dashed rgba(255,255,255,0.4);
 }
 
 .store-button.coming-soon:hover {
   transform: none;
   box-shadow: none;
+}
+
+.store-button.coming-soon::after {
+  content: '🔜';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5rem;
 }
 
 .store-icon {
@@ -579,6 +589,103 @@ footer {
   font-size: 0.9rem;
   border-top: 1px solid rgba(245, 239, 225, 0.1);
   padding-top: 24px;
+}
+
+/* ===== PREMIUM INFO ===== */
+.premium-info {
+  margin-top: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.premium-info h3 {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+
+.premium-info p {
+  color: #f5efe1;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.premium-info strong {
+  color: #ffd700;
+}
+
+.premium-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.premium-features li {
+  color: #f5efe1;
+  padding: 8px 0;
+  font-size: 1rem;
+}
+
+.premium-note {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-style: italic;
+  margin-bottom: 0;
+}
+
+/* ===== FAQ SECTION ===== */
+.faq {
+  background: #f5efe1;
+  padding: 80px 24px;
+}
+
+.faq h2 {
+  text-align: center;
+  font-size: 2.4rem;
+  color: #0d4532;
+  margin-bottom: 48px;
+  font-weight: 700;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(13, 69, 50, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(13, 69, 50, 0.12);
+}
+
+.faq-item h3 {
+  color: #0d4532;
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.faq-item p {
+  color: #2a5a44;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 /* ===== PRIVACY PAGE ===== */
@@ -705,5 +812,21 @@ footer {
   .footer-content {
     flex-direction: column;
     text-align: center;
+  }
+  
+  .faq-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .premium-info {
+    padding: 24px;
+    margin-top: 32px;
+  }
+  
+  .faq h2,
+  .features h2,
+  .how-it-works h2,
+  .download h2 {
+    font-size: 2rem;
   }
 }
