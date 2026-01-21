@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PictPath OG Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5efe1;
+    }
+    
+    .og-container {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(135deg, #0d4532 0%, #1a6b4a 50%, #0d4532 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 60px;
+    }
+    
+    /* Decorative mountains */
+    .mountains {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: 
+        linear-gradient(125deg, transparent 40%, #0a3526 40%, #0a3526 45%, transparent 45%),
+        linear-gradient(135deg, transparent 30%, #0a3526 30%, #0a3526 50%, transparent 50%),
+        linear-gradient(145deg, transparent 50%, #0a3526 50%);
+      opacity: 0.4;
+    }
+    
+    /* Sun decoration */
+    .sun {
+      position: absolute;
+      top: 60px;
+      right: 100px;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #FFD93D 0%, #FF6B35 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 80px rgba(255, 217, 61, 0.5);
+    }
+    
+    /* Path decoration */
+    .path {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+    
+    .path-dot {
+      width: 12px;
+      height: 12px;
+      background: rgba(245, 239, 225, 0.3);
+      border-radius: 50%;
+    }
+    
+    .path-dot:nth-child(2) { opacity: 0.5; }
+    .path-dot:nth-child(3) { opacity: 0.7; }
+    .path-dot:nth-child(4) { opacity: 0.9; }
+    .path-dot:nth-child(5) { background: #FF6B35; }
+    
+    /* Content */
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      z-index: 10;
+      width: 100%;
+    }
+    
+    .text-content {
+      flex: 1;
+    }
+    
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    
+    .app-name {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #f5efe1;
+      letter-spacing: -1px;
+    }
+    
+    .tagline {
+      font-size: 2rem;
+      color: #f5efe1;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .description {
+      font-size: 1.3rem;
+      color: rgba(245, 239, 225, 0.85);
+      line-height: 1.6;
+      max-width: 550px;
+    }
+    
+    .features {
+      display: flex;
+      gap: 24px;
+      margin-top: 32px;
+    }
+    
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f5efe1;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.1);
+      padding: 10px 18px;
+      border-radius: 30px;
+    }
+    
+    .feature-icon {
+      font-size: 1.3rem;
+    }
+    
+    /* Phone mockup */
+    .phone-container {
+      position: relative;
+    }
+    
+    .phone {
+      width: 240px;
+      height: 480px;
+      background: #222;
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 24px;
+      background: #111;
+      border-radius: 12px;
+      z-index: 20;
+    }
+    
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #1a1a1a;
+      border-radius: 28px;
+      overflow: hidden;
+    }
+    
+    .phone-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Badge */
+    .badge {
+      position: absolute;
+      bottom: 80px;
+      right: 60px;
+      background: #FF6B35;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="og-container">
+    <!-- Decorations -->
+    <div class="sun"></div>
+    <div class="mountains"></div>
+    <div class="path">
+      <div class="path-dot"></div>
+      <div class="path-dot"></div>
+      <div class="path-dot"></div>
+      <div class="path-dot"></div>
+      <div class="path-dot"></div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="content">
+      <div class="text-content">
+        <div class="logo-row">
+          <img src="Logo-Pictpath.png" alt="PictPath" class="logo">
+          <span class="app-name">PictPath</span>
+        </div>
+        <p class="tagline">Your Adventures on the Map</p>
+        <p class="description">Track your routes with GPS, capture geo-tagged photos, and share interactive trip maps with friends.</p>
+        <div class="features">
+          <div class="feature">
+            <span class="feature-icon">📍</span>
+            GPS Tracking
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📷</span>
+            Photo Map
+          </div>
+          <div class="feature">
+            <span class="feature-icon">🌐</span>
+            Share Trips
+          </div>
+        </div>
+      </div>
+      
+      <div class="phone-container">
+        <div class="phone">
+          <div class="phone-screen">
+            <img src="Screenshot_20251223_194507_PicPath.jpg" alt="PictPath Screenshot">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="badge">Free for Android</div>
+  </div>
+</body>
+</html>
