@@ -9,6 +9,13 @@
   <link rel="canonical" href="https://pictpath.com/privacy/">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .location-highlight { background: #e8f5e9; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #0d4532; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    .data-table th, .data-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    .data-table th { background: #0d4532; color: white; }
+    .data-table tr:nth-child(even) { background: #f9f9f9; }
+  </style>
 </head>
 <body>
   <div class="privacy-page">
@@ -16,7 +23,7 @@
       <a href="/" class="back-link">← Back to Home</a>
       
       <h1>Privacy Policy</h1>
-      <p class="last-updated">Last updated: January 26, 2026</p>
+      <p class="last-updated">Last updated: January 28, 2026</p>
 
       <section>
         <h2>Introduction</h2>
@@ -24,39 +31,73 @@
       </section>
 
       <section>
-        <h2>Information We Collect</h2>
-        <h3>Location Data</h3>
-        <p>PictPath collects GPS location data to track your route during trips. This data is:</p>
+        <h2>Location Data Collection</h2>
+        <div class="location-highlight">
+          <strong>🗺️ PictPath collects and uses your precise location (GPS) data to provide trip tracking features.</strong>
+        </div>
+        
+        <h3>What Location Data We Collect</h3>
+        <table class="data-table">
+          <tr>
+            <th>Data Type</th>
+            <th>When Collected</th>
+            <th>Purpose</th>
+            <th>Storage</th>
+          </tr>
+          <tr>
+            <td>Precise GPS Location</td>
+            <td>When you start a trip and during active recording</td>
+            <td>To record your travel route on a map</td>
+            <td>Stored locally on your device</td>
+          </tr>
+          <tr>
+            <td>Photo Location</td>
+            <td>When you take a photo during a trip</td>
+            <td>To geo-tag photos and display them on your trip map</td>
+            <td>Stored locally on your device</td>
+          </tr>
+          <tr>
+            <td>Background Location</td>
+            <td>During active trip recording (while app is minimized)</td>
+            <td>To continuously track your route even when using other apps</td>
+            <td>Stored locally on your device</td>
+          </tr>
+        </table>
+
+        <h3>How We Use Your Location Data</h3>
         <ul>
-          <li>Only collected when you actively start a trip</li>
-          <li>Stored locally on your device</li>
-          <li>Only uploaded to our servers if you choose to share a trip</li>
+          <li><strong>GPS Track Recording:</strong> To draw your travel route on an interactive map</li>
+          <li><strong>Photo Geo-tagging:</strong> To associate each photo with its geographic location</li>
+          <li><strong>Trip Statistics:</strong> To calculate distance traveled, average speed, and trip duration</li>
+          <li><strong>Map Display:</strong> To show your location and route using OpenStreetMap</li>
+          <li><strong>Trip Sharing (Optional):</strong> If you choose to share a trip, location data may be included</li>
         </ul>
 
-        <h3>Photos and Videos</h3>
-        <p>Photos and videos you take within the app are:</p>
+        <h3>What We Do NOT Do With Your Location</h3>
         <ul>
-          <li>Stored locally on your device</li>
-          <li>Tagged with GPS coordinates for map display</li>
-          <li>Only uploaded if you choose to share a trip</li>
-        </ul>
-
-        <h3>Account Information</h3>
-        <p>If you create an account, we collect:</p>
-        <ul>
-          <li>Email address (for authentication)</li>
-          <li>Display name (optional)</li>
+          <li>We do NOT track your location when you are not recording a trip</li>
+          <li>We do NOT sell or share your location data with advertisers</li>
+          <li>We do NOT use your location for user profiling or tracking</li>
+          <li>We do NOT upload your location to servers without your explicit action</li>
         </ul>
       </section>
 
       <section>
-        <h2>How We Use Your Information</h2>
-        <p>We use your information to:</p>
+        <h2>Photos and Videos</h2>
+        <p>Photos and videos you take within the app are:</p>
         <ul>
-          <li>Display your route and photos on the map</li>
-          <li>Enable trip sharing features</li>
-          <li>Provide customer support</li>
-          <li>Improve our app</li>
+          <li>Stored locally on your device by default</li>
+          <li>Tagged with GPS coordinates for map display</li>
+          <li>Only uploaded if you explicitly choose to share a trip</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Account Information (Optional)</h2>
+        <p>If you create an account for cloud sync, we collect:</p>
+        <ul>
+          <li>Email address (for authentication)</li>
+          <li>Display name (optional)</li>
         </ul>
       </section>
 
@@ -71,24 +112,31 @@
 
       <section>
         <h2>Data Storage</h2>
-        <p>Your data is stored securely using industry-standard encryption. Trip data is stored on Supabase servers located in the EU.</p>
+        <p><strong>All data is stored locally on your device by default.</strong> If you use optional cloud features:</p>
+        <ul>
+          <li>Trip data may be stored on Supabase servers using industry-standard encryption</li>
+          <li>Shared trips are automatically deleted after 30 days</li>
+          <li>You can manually delete your data at any time</li>
+        </ul>
       </section>
 
       <section>
         <h2>Your Rights</h2>
         <p>You have the right to:</p>
         <ul>
-          <li>Access your personal data</li>
+          <li>Access your personal data at any time within the app</li>
+          <li>Delete any trip, photo, or all app data</li>
+          <li>Stop location tracking by ending the trip or revoking permissions</li>
+          <li>Export your trip data using standard device features</li>
           <li>Delete your account and all associated data</li>
-          <li>Export your trip data</li>
-          <li>Opt out of data collection by not using the app</li>
+          <li>Remove all data by uninstalling the app</li>
         </ul>
       </section>
 
       <section>
         <h2>Contact Us</h2>
         <p>If you have questions about this Privacy Policy, contact us at:</p>
-        <p><a href="mailto:contact@pictpath.com">contact@pictpath.com</a></p>
+        <p><a href="mailto:mralx44@gmail.com">mralx44@gmail.com</a></p>
       </section>
     </div>
   </div>

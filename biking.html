@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Bike Route Tracker App - Track Cycling Routes with Photos | PictPath</title>
+  <meta name="description" content="Track your bike rides with PictPath. GPS cycling route tracker, geo-tagged photos, speed stats, and easy sharing. The best free bike tracker app for Android.">
+  <meta name="keywords" content="bike route tracker, cycling app, bike tracker app, bicycle GPS app, cycling route tracker, bike ride tracker, mountain biking app, road cycling app, bike trip tracker, cycling photo app">
+  <meta name="author" content="PictPath">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://pictpath.com/biking">
+  
+  <meta name="theme-color" content="#0d4532">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="Logo-Pictpath.png">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pictpath.com/biking">
+  <meta property="og:title" content="Bike Route Tracker App - Track Your Rides | PictPath">
+  <meta property="og:description" content="Track your cycling adventures with GPS, capture photos along the route, and share your rides.">
+  <meta property="og:image" content="https://pictpath.com/og-preview.png">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Bike Route Tracker App - PictPath",
+    "description": "Track your cycling and biking adventures with PictPath",
+    "url": "https://pictpath.com/biking",
+    "mainEntity": {
+      "@type": "MobileApplication",
+      "name": "PictPath - Bike Tracker",
+      "operatingSystem": "Android",
+      "applicationCategory": "SportsApplication",
+      "applicationSubCategory": "Cycling",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  }
+  </script>
+  
+  <style>
+    .landing-hero {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #8e44ad 100%);
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 20px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .landing-hero::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 200"><path fill="%23ffffff" d="M0,100 C200,150 400,50 720,100 C1040,150 1240,50 1440,100 L1440,200 L0,200 Z"/></svg>');
+      background-size: cover;
+    }
+    .landing-hero h1 {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .landing-hero .emoji {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .landing-hero p {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.9);
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    .landing-content {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .landing-content h2 {
+      font-size: 2rem;
+      color: #c0392b;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .landing-content p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #444;
+      margin-bottom: 20px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .feature-card {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+    }
+    .feature-card .icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    .feature-card h3 {
+      color: #c0392b;
+      margin-bottom: 10px;
+    }
+    .cta-section {
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      padding: 60px 20px;
+      text-align: center;
+      color: white;
+    }
+    .cta-section h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #ffd700;
+      color: #c0392b;
+      padding: 15px 40px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(192, 57, 43, 0.95);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    .nav-bar a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-bar .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-bar .logo-link img {
+      height: 35px;
+    }
+    .bike-types {
+      background: #fdf2f2;
+      padding: 60px 20px;
+    }
+    .bike-types h2 {
+      text-align: center;
+      color: #c0392b;
+      margin-bottom: 40px;
+    }
+    .bike-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .bike-card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .bike-card .icon {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+    }
+    .bike-card h3 {
+      color: #c0392b;
+      margin-bottom: 10px;
+    }
+    .bike-card p {
+      color: #666;
+    }
+    .stats-preview {
+      background: #2c3e50;
+      padding: 60px 20px;
+      color: white;
+    }
+    .stats-preview h2 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .stat-item .number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #e74c3c;
+    }
+    .stat-item .label {
+      color: rgba(255,255,255,0.8);
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-bar">
+    <a href="/" class="logo-link">
+      <img src="Logo-Pictpath.png" alt="PictPath">
+      <span>PictPath</span>
+    </a>
+    <a href="/#download" class="cta-button" style="padding: 10px 25px; font-size: 0.9rem;">Download Free</a>
+  </nav>
+
+  <section class="landing-hero">
+    <div>
+      <span class="emoji">🚴</span>
+      <h1>Bike Route Tracker App</h1>
+      <p>Track every ride, capture the views, and share your cycling adventures with the world.</p>
+      <a href="/#download" class="cta-button">Download Free for Android</a>
+    </div>
+  </section>
+
+  <section class="landing-content">
+    <h2>The Cyclist's Perfect Companion</h2>
+    <p>Whether you're commuting to work, training for a race, or exploring mountain trails, PictPath tracks your entire route with precision GPS. Capture photos at scenic stops and see your complete ride on an interactive map.</p>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">📍</div>
+        <h3>Precise GPS Tracking</h3>
+        <p>High-accuracy GPS records every turn and climb of your cycling route.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">⚡</div>
+        <h3>Speed Tracking</h3>
+        <p>See your average speed, max speed, and pace throughout your ride.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📸</div>
+        <h3>Photo Checkpoints</h3>
+        <p>Snap photos at scenic spots. They're automatically added to your route map.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📊</div>
+        <h3>Ride Statistics</h3>
+        <p>Track distance, duration, and elevation for every cycling session.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔋</div>
+        <h3>Battery Efficient</h3>
+        <p>Optimized background tracking won't drain your battery on long rides.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔗</div>
+        <h3>Share Your Rides</h3>
+        <p>Generate a link and share your cycling route with friends and fellow riders.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-preview">
+    <h2>Track Your Cycling Stats</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="number">📏</div>
+        <div class="label">Distance</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">⏱️</div>
+        <div class="label">Duration</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">🚀</div>
+        <div class="label">Avg Speed</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">📸</div>
+        <div class="label">Photos</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bike-types">
+    <h2>Perfect for All Cycling Styles</h2>
+    <div class="bike-grid">
+      <div class="bike-card">
+        <div class="icon">🚵</div>
+        <h3>Mountain Biking</h3>
+        <p>Track your trail rides through forests and mountains. Capture epic views at the summit.</p>
+      </div>
+      <div class="bike-card">
+        <div class="icon">🚴‍♂️</div>
+        <h3>Road Cycling</h3>
+        <p>Record your road rides with precise route tracking and speed statistics.</p>
+      </div>
+      <div class="bike-card">
+        <div class="icon">🚲</div>
+        <h3>Bike Touring</h3>
+        <p>Multi-day bike tours? Create a trip and track each day's ride separately.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Start Tracking Your Rides</h2>
+    <p style="margin-bottom: 30px; opacity: 0.9;">Download PictPath and capture every cycling adventure.</p>
+    <a href="https://play.google.com/store/apps/details?id=com.mralx44.pictpath" class="cta-button">
+      Download Free on Google Play
+    </a>
+  </section>
+
+  <footer style="background: #c0392b; color: white; padding: 30px; text-align: center;">
+    <p>© 2026 PictPath. Your Adventures on the Map.</p>
+    <p style="margin-top: 10px;">
+      <a href="/" style="color: #ffd700;">Home</a> · 
+      <a href="/hiking" style="color: #ffd700;">Hiking</a> · 
+      <a href="/road-trips" style="color: #ffd700;">Road Trips</a> · 
+      <a href="/privacy" style="color: #ffd700;">Privacy</a>
+    </p>
+  </footer>
+</body>
+</html>
