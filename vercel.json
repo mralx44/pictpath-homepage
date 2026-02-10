@@ -43,6 +43,38 @@
     {
       "source": "/delete-data",
       "destination": "/delete-data.html"
+    },
+    {
+      "source": "/hiking/",
+      "destination": "/hiking.html"
+    },
+    {
+      "source": "/hiking",
+      "destination": "/hiking.html"
+    },
+    {
+      "source": "/road-trips/",
+      "destination": "/road-trips.html"
+    },
+    {
+      "source": "/road-trips",
+      "destination": "/road-trips.html"
+    },
+    {
+      "source": "/biking/",
+      "destination": "/biking.html"
+    },
+    {
+      "source": "/biking",
+      "destination": "/biking.html"
+    },
+    {
+      "source": "/events/",
+      "destination": "/events.html"
+    },
+    {
+      "source": "/events",
+      "destination": "/events.html"
     }
   ]
 }
