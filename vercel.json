@@ -75,6 +75,22 @@
     {
       "source": "/events",
       "destination": "/events.html"
+    },
+    {
+      "source": "/backup/",
+      "destination": "/backup.html"
+    },
+    {
+      "source": "/backup",
+      "destination": "/backup.html"
+    },
+    {
+      "source": "/backup/:id",
+      "destination": "/backup.html"
+    },
+    {
+      "source": "/backup/:id/",
+      "destination": "/backup.html"
     }
   ]
 }

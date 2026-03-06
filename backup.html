@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Your Backup - PictPath</title>
+    <meta name="description" content="View your PictPath cloud backup trips">
+    <link rel="icon" type="image/png" href="pictpath-logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .backup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .search-box h2 {
+            margin-bottom: 15px;
+            color: #f5efe1;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: #f5efe1;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .search-box input::placeholder {
+            color: rgba(245,239,225,0.5);
+        }
+        .search-box button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: #f5efe1;
+            color: #0d4532;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .search-box button:hover {
+            transform: scale(1.02);
+        }
+        .backup-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .backup-info h3 {
+            color: #f5efe1;
+            margin-bottom: 10px;
+        }
+        .backup-info p {
+            color: rgba(245,239,225,0.7);
+            margin: 5px 0;
+        }
+        .trips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .trip-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .trip-card:hover {
+            transform: translateX(5px);
+        }
+        .trip-card h4 {
+            color: #f5efe1;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        .trip-card .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: rgba(245,239,225,0.7);
+            font-size: 14px;
+        }
+        .trip-card .stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .error-message {
+            background: rgba(255,100,100,0.2);
+            border: 1px solid rgba(255,100,100,0.5);
+            border-radius: 12px;
+            padding: 20px;
+            color: #f5efe1;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            color: rgba(245,239,225,0.7);
+            padding: 40px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(245,239,225,0.3);
+            border-top-color: #f5efe1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .help-text {
+            text-align: center;
+            color: rgba(245,239,225,0.5);
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-content">
+            <a href="index.html" class="logo">
+                <img src="pictpath-logo.png" alt="PictPath Logo" style="height: 40px;">
+                <span>PictPath</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="backup-container">
+        <h1 style="text-align: center; margin: 40px 0; color: #f5efe1;">☁️ View Your Cloud Backup</h1>
+        
+        <div class="search-box" id="searchBox">
+            <h2>Enter Your Backup ID</h2>
+            <p style="color: rgba(245,239,225,0.6); margin-bottom: 15px;">
+                Find your Backup ID in the PictPath app: Settings → Cloud Backup → Copy Backup ID
+            </p>
+            <input type="text" id="backupIdInput" placeholder="anon_1234567890_abc123xyz" autocomplete="off">
+            <button onclick="loadBackup()">View My Trips</button>
+            <p class="help-text">Your backup ID stays on your device. We don't track who views what.</p>
+        </div>
+        
+        <div id="resultsContainer"></div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 PictPath. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="delete-data.html">Delete Data</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Supabase config
+        const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Check URL for backup ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlBackupId = urlParams.get('id');
+        
+        // Also check path for /backup/ID format
+        const pathMatch = window.location.pathname.match(/\/backup\/(.+)/);
+        const pathBackupId = pathMatch ? pathMatch[1] : null;
+        
+        if (urlBackupId || pathBackupId) {
+            document.getElementById('backupIdInput').value = urlBackupId || pathBackupId;
+            loadBackup();
+        }
+        
+        async function loadBackup() {
+            const backupId = document.getElementById('backupIdInput').value.trim();
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (!backupId) {
+                resultsContainer.innerHTML = '<div class="error-message">Please enter a backup ID</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading your trips...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('trip_backups')
+                    .select('*')
+                    .eq('user_id', backupId)
+                    .single();
+                
+                if (error || !data) {
+                    resultsContainer.innerHTML = '<div class="error-message">No backup found with this ID. Please check your Backup ID in the app.</div>';
+                    return;
+                }
+                
+                // Display backup info
+                const trips = data.trips_data || [];
+                const backupDate = new Date(data.backup_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let html = `
+                    <div class="backup-info">
+                        <h3>📱 Backup from ${data.device_name || 'Unknown Device'}</h3>
+                        <p>Last backup: ${backupDate}</p>
+                        <p>Total trips: ${trips.length}</p>
+                        <p>App version: ${data.app_version || 'Unknown'}</p>
+                    </div>
+                    <h3 style="color: #f5efe1; margin-bottom: 15px;">Your Trips</h3>
+                    <div class="trips-list">
+                `;
+                
+                if (trips.length === 0) {
+                    html += '<div class="trip-card"><p style="color: rgba(245,239,225,0.7);">No trips in this backup yet.</p></div>';
+                } else {
+                    // Sort trips by date (newest first)
+                    trips.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    for (const trip of trips) {
+                        const tripDate = new Date(trip.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        
+                        const duration = trip.duration ? formatDuration(trip.duration) : '-';
+                        const distance = trip.distance ? trip.distance.toFixed(2) + ' km' : '-';
+                        const speed = trip.averageSpeed ? trip.averageSpeed.toFixed(1) + ' km/h' : '-';
+                        
+                        html += `
+                            <div class="trip-card">
+                                <h4>${trip.name || 'Unnamed Trip'}</h4>
+                                <div class="stats">
+                                    <span>📅 ${tripDate}</span>
+                                    <span>📸 ${trip.photoCount || 0} photos</span>
+                                    <span>⏱️ ${duration}</span>
+                                    <span>📍 ${distance}</span>
+                                    <span>🚀 ${speed}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+                
+                // Hide search box after successful load
+                document.getElementById('searchBox').style.display = 'none';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                resultsContainer.innerHTML = '<div class="error-message">Error loading backup. Please try again.</div>';
+            }
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
+        }
+    </script>
+</body>
+</html>
