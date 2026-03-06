@@ -118,6 +118,20 @@
   </script>
 </head>
 <body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" class="nav-logo">
+      <img src="Logo-Pictpath.png" alt="PictPath">
+      <span>PictPath</span>
+    </a>
+    <div class="nav-menu">
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="backup.html">My Backup</a>
+      <a href="login.html" class="nav-login-btn">Sign In</a>
+    </div>
+  </nav>
+
   <!-- Hero Section with illustrated landscape -->
   <section class="hero">
     <!-- Sun -->
@@ -356,5 +370,41 @@
       <p class="copyright">&copy; 2026 PictPath. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Navigation scroll effect and auth check -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Scroll effect for navigation
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('mainNav');
+      if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+    
+    // Check if user is logged in and update nav
+    (async () => {
+      try {
+        const supabase = window.supabase.createClient(
+          'https://aiyaqjveeqdeqllkddyp.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM'
+        );
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // User is logged in, change button to "My Trips"
+          const loginBtn = document.querySelector('.nav-login-btn');
+          if (loginBtn) {
+            loginBtn.textContent = 'My Trips';
+            loginBtn.href = 'dashboard.html';
+          }
+        }
+      } catch (e) {
+        // Ignore auth check errors
+      }
+    })();
+  </script>
 </body>
 </html>

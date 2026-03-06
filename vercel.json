@@ -91,6 +91,22 @@
     {
       "source": "/backup/:id/",
       "destination": "/backup.html"
+    },
+    {
+      "source": "/login/",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/dashboard/",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
     }
   ]
 }

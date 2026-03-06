@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Trips - PictPath</title>
+    <meta name="description" content="View and share your PictPath trips">
+    <link rel="icon" type="image/png" href="pictpath-logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 69, 50, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-bar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f5efe1;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .nav-bar .logo img {
+            height: 35px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-links a, .nav-links button {
+            color: rgba(245,239,225,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .nav-links a:hover, .nav-links button:hover {
+            color: #f5efe1;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #f5efe1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d4532;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .dashboard-header h1 {
+            color: #f5efe1;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f5efe1;
+        }
+        .stat-card .label {
+            color: rgba(245,239,225,0.6);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .trips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .trip-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .trip-card:hover {
+            transform: translateY(-5px);
+        }
+        .trip-card-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .trip-card-header h3 {
+            color: #f5efe1;
+            margin: 0 0 5px 0;
+            font-size: 18px;
+        }
+        .trip-card-header .date {
+            color: rgba(245,239,225,0.5);
+            font-size: 13px;
+        }
+        .trip-card-stats {
+            padding: 15px 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: rgba(245,239,225,0.7);
+        }
+        .trip-card-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .trip-card-actions {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+        .trip-card-actions button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .share-btn {
+            background: #f5efe1;
+            color: #0d4532;
+        }
+        .share-btn:hover {
+            transform: scale(1.02);
+        }
+        .view-btn {
+            background: rgba(255,255,255,0.15);
+            color: #f5efe1;
+        }
+        .view-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(245,239,225,0.6);
+        }
+        .empty-state h2 {
+            color: #f5efe1;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: rgba(245,239,225,0.7);
+        }
+        .loading-spinner-lg {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(245,239,225,0.2);
+            border-top-color: #f5efe1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Share Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #0d4532, #1a6b4a);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+        }
+        .modal-content h2 {
+            color: #f5efe1;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        .share-link-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .share-link-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #9ed4ff;
+            font-size: 14px;
+            outline: none;
+        }
+        .copy-btn {
+            background: #f5efe1;
+            color: #0d4532;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .share-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .share-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .share-option:hover {
+            transform: scale(1.1);
+        }
+        .share-whatsapp { background: #25D366; }
+        .share-facebook { background: #1877F2; }
+        .share-twitter { background: #1DA1F2; }
+        .share-email { background: #EA4335; }
+        .close-modal {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(245,239,225,0.3);
+            border-radius: 10px;
+            background: none;
+            color: #f5efe1;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .close-modal:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .visibility-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle-switch.active {
+            background: #4ade80;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+        .toggle-label {
+            flex: 1;
+        }
+        .toggle-label .title {
+            color: #f5efe1;
+            font-weight: 500;
+        }
+        .toggle-label .desc {
+            color: rgba(245,239,225,0.5);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html" class="logo">
+            <img src="pictpath-logo.png" alt="PictPath">
+            <span>PictPath</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <div class="user-avatar" id="userAvatar">?</div>
+            <button onclick="signOut()">Sign Out</button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-spinner-lg"></div>
+            <p>Loading your trips...</p>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" style="display: none;">
+            <div class="dashboard-header">
+                <h1>🗺️ My Trips</h1>
+            </div>
+            
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="value" id="totalTrips">0</div>
+                    <div class="label">Total Trips</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalPhotos">0</div>
+                    <div class="label">Photos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalDistance">0</div>
+                    <div class="label">km traveled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalDuration">0h</div>
+                    <div class="label">Adventure time</div>
+                </div>
+            </div>
+            
+            <div class="trips-grid" id="tripsGrid">
+                <!-- Trips will be loaded here -->
+            </div>
+            
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h2>No trips yet</h2>
+                <p>Start recording trips in the PictPath app, then sync them here!</p>
+                <a href="https://play.google.com/store/apps/details?id=com.mralx44.pictpath" class="cta-button primary" style="display: inline-block; padding: 15px 30px; background: #f5efe1; color: #0d4532; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                    Download the App
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal" style="display: none;">
+        <div class="modal-content">
+            <h2>📤 Share Trip</h2>
+            
+            <div class="visibility-toggle">
+                <div class="toggle-switch" id="publicToggle" onclick="togglePublic()"></div>
+                <div class="toggle-label">
+                    <div class="title">Public trip</div>
+                    <div class="desc">Anyone with the link can view</div>
+                </div>
+            </div>
+            
+            <div class="share-link-box">
+                <input type="text" id="shareLink" readonly>
+                <button class="copy-btn" onclick="copyShareLink()">Copy</button>
+            </div>
+            
+            <div class="share-options">
+                <button class="share-option share-whatsapp" onclick="shareWhatsApp()">💬</button>
+                <button class="share-option share-facebook" onclick="shareFacebook()">📘</button>
+                <button class="share-option share-twitter" onclick="shareTwitter()">🐦</button>
+                <button class="share-option share-email" onclick="shareEmail()">📧</button>
+            </div>
+            
+            <button class="close-modal" onclick="closeShareModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase config
+        const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentUser = null;
+        let currentTrips = [];
+        let selectedTrip = null;
+        
+        // Check auth and load data
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = session.user;
+            
+            // Update avatar
+            document.getElementById('userAvatar').textContent = 
+                (currentUser.email || '?')[0].toUpperCase();
+            
+            await loadTrips();
+        }
+        
+        async function loadTrips() {
+            try {
+                // Load trips from user_trips table
+                const { data: trips, error } = await supabase
+                    .from('user_trips')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('date', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading trips:', error);
+                }
+                
+                currentTrips = trips || [];
+                
+                // Hide loading, show content
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                
+                if (currentTrips.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('tripsGrid').style.display = 'none';
+                    document.getElementById('statsRow').style.display = 'none';
+                } else {
+                    document.getElementById('emptyState').style.display = 'none';
+                    document.getElementById('tripsGrid').style.display = 'grid';
+                    document.getElementById('statsRow').style.display = 'grid';
+                    renderTrips();
+                    updateStats();
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('loadingScreen').innerHTML = 
+                    '<p style="color: #ffaaaa;">Error loading trips. Please refresh the page.</p>';
+            }
+        }
+        
+        function renderTrips() {
+            const grid = document.getElementById('tripsGrid');
+            grid.innerHTML = currentTrips.map(trip => `
+                <div class="trip-card">
+                    <div class="trip-card-header">
+                        <h3>${escapeHtml(trip.name || 'Unnamed Trip')}</h3>
+                        <div class="date">${formatDate(trip.date)}</div>
+                    </div>
+                    <div class="trip-card-stats">
+                        <span>📸 ${trip.photo_count || 0} photos</span>
+                        <span>📍 ${(trip.distance || 0).toFixed(1)} km</span>
+                        <span>⏱️ ${formatDuration(trip.duration || 0)}</span>
+                    </div>
+                    <div class="trip-card-actions">
+                        <button class="view-btn" onclick="viewTrip('${trip.id}')">View Map</button>
+                        <button class="share-btn" onclick="openShareModal('${trip.id}')">Share</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats() {
+            const totalTrips = currentTrips.length;
+            const totalPhotos = currentTrips.reduce((sum, t) => sum + (t.photo_count || 0), 0);
+            const totalDistance = currentTrips.reduce((sum, t) => sum + (t.distance || 0), 0);
+            const totalDuration = currentTrips.reduce((sum, t) => sum + (t.duration || 0), 0);
+            
+            document.getElementById('totalTrips').textContent = totalTrips;
+            document.getElementById('totalPhotos').textContent = totalPhotos;
+            document.getElementById('totalDistance').textContent = totalDistance.toFixed(0);
+            document.getElementById('totalDuration').textContent = formatDurationShort(totalDuration);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+        
+        function formatDurationShort(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            if (hours > 0) return `${hours}h`;
+            return `${Math.floor(seconds / 60)}m`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // View trip on map (using shared trips viewer)
+        function viewTrip(tripId) {
+            const trip = currentTrips.find(t => t.id === tripId);
+            if (trip && trip.share_id) {
+                window.open(`https://pictpath-web.vercel.app/trip/${trip.share_id}`, '_blank');
+            } else {
+                // Create a share first
+                openShareModal(tripId);
+            }
+        }
+        
+        // Share Modal
+        async function openShareModal(tripId) {
+            selectedTrip = currentTrips.find(t => t.id === tripId);
+            if (!selectedTrip) return;
+            
+            // Check if trip has a share link
+            if (!selectedTrip.share_id) {
+                // Generate share ID
+                const shareId = generateShareId();
+                
+                // Update trip with share ID
+                const { error } = await supabase
+                    .from('user_trips')
+                    .update({ share_id: shareId, is_public: true })
+                    .eq('id', tripId);
+                
+                if (!error) {
+                    selectedTrip.share_id = shareId;
+                    selectedTrip.is_public = true;
+                }
+            }
+            
+            // Update modal
+            const shareUrl = `https://pictpath-web.vercel.app/trip/${selectedTrip.share_id}`;
+            document.getElementById('shareLink').value = shareUrl;
+            
+            const toggle = document.getElementById('publicToggle');
+            if (selectedTrip.is_public) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+            
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+        
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+            selectedTrip = null;
+        }
+        
+        async function togglePublic() {
+            if (!selectedTrip) return;
+            
+            const newValue = !selectedTrip.is_public;
+            
+            const { error } = await supabase
+                .from('user_trips')
+                .update({ is_public: newValue })
+                .eq('id', selectedTrip.id);
+            
+            if (!error) {
+                selectedTrip.is_public = newValue;
+                const toggle = document.getElementById('publicToggle');
+                if (newValue) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
+        }
+        
+        function copyShareLink() {
+            const input = document.getElementById('shareLink');
+            input.select();
+            document.execCommand('copy');
+            
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy', 2000);
+        }
+        
+        function shareWhatsApp() {
+            const url = document.getElementById('shareLink').value;
+            const text = `Check out my trip "${selectedTrip?.name}" on PictPath!`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+        }
+        
+        function shareFacebook() {
+            const url = document.getElementById('shareLink').value;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareTwitter() {
+            const url = document.getElementById('shareLink').value;
+            const text = `Check out my trip "${selectedTrip?.name}" on PictPath!`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareEmail() {
+            const url = document.getElementById('shareLink').value;
+            const subject = `My Trip: ${selectedTrip?.name}`;
+            const body = `Check out my trip on PictPath!\n\n${url}`;
+            window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        }
+        
+        function generateShareId() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        async function signOut() {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        }
+        
+        // Close modal on outside click
+        document.getElementById('shareModal').addEventListener('click', (e) => {
+            if (e.target.id === 'shareModal') {
+                closeShareModal();
+            }
+        });
+        
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
