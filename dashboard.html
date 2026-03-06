@@ -480,7 +480,7 @@
                     .from('user_trips')
                     .select('*')
                     .eq('user_id', currentUser.id)
-                    .order('date', { ascending: false });
+                    .order('trip_date', { ascending: false });
                 
                 if (error) {
                     console.error('Error loading trips:', error);
@@ -515,13 +515,13 @@
             grid.innerHTML = currentTrips.map(trip => `
                 <div class="trip-card">
                     <div class="trip-card-header">
-                        <h3>${escapeHtml(trip.name || 'Unnamed Trip')}</h3>
-                        <div class="date">${formatDate(trip.date)}</div>
+                        <h3>${escapeHtml(trip.trip_name || 'Unnamed Trip')}</h3>
+                        <div class="date">${formatDate(trip.trip_date)}</div>
                     </div>
                     <div class="trip-card-stats">
                         <span>📸 ${trip.photo_count || 0} photos</span>
-                        <span>📍 ${(trip.distance || 0).toFixed(1)} km</span>
-                        <span>⏱️ ${formatDuration(trip.duration || 0)}</span>
+                        <span>📍 ${(trip.distance_km || 0).toFixed(1)} km</span>
+                        <span>⏱️ ${formatDuration(trip.duration_seconds || 0)}</span>
                     </div>
                     <div class="trip-card-actions">
                         <button class="view-btn" onclick="viewTrip('${trip.id}')">View Map</button>
@@ -534,8 +534,8 @@
         function updateStats() {
             const totalTrips = currentTrips.length;
             const totalPhotos = currentTrips.reduce((sum, t) => sum + (t.photo_count || 0), 0);
-            const totalDistance = currentTrips.reduce((sum, t) => sum + (t.distance || 0), 0);
-            const totalDuration = currentTrips.reduce((sum, t) => sum + (t.duration || 0), 0);
+            const totalDistance = currentTrips.reduce((sum, t) => sum + (t.distance_km || 0), 0);
+            const totalDuration = currentTrips.reduce((sum, t) => sum + (t.duration_seconds || 0), 0);
             
             document.getElementById('totalTrips').textContent = totalTrips;
             document.getElementById('totalPhotos').textContent = totalPhotos;
@@ -657,7 +657,7 @@
         
         function shareWhatsApp() {
             const url = document.getElementById('shareLink').value;
-            const text = `Check out my trip "${selectedTrip?.name}" on PictPath!`;
+            const text = `Check out my trip "${selectedTrip?.trip_name}" on PictPath!`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
         }
         
@@ -668,13 +668,13 @@
         
         function shareTwitter() {
             const url = document.getElementById('shareLink').value;
-            const text = `Check out my trip "${selectedTrip?.name}" on PictPath!`;
+            const text = `Check out my trip "${selectedTrip?.trip_name}" on PictPath!`;
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
         }
         
         function shareEmail() {
             const url = document.getElementById('shareLink').value;
-            const subject = `My Trip: ${selectedTrip?.name}`;
+            const subject = `My Trip: ${selectedTrip?.trip_name}`;
             const body = `Check out my trip on PictPath!\n\n${url}`;
             window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
         }
