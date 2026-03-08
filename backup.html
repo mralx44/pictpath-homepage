@@ -7,12 +7,64 @@
     <meta name="description" content="View your PictPath cloud backup trips">
     <link rel="icon" type="image/png" href="/pictpath-logo.png">
     <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* Base styles in case external CSS doesn't load */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0d4532 0%, #1a6b4a 50%, #0d4532 100%);
+            min-height: 100vh;
+            color: #f5efe1;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 69, 50, 0.95);
+            padding: 15px 30px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+        nav .nav-content {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #f5efe1;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        nav .nav-links a {
+            color: #f5efe1;
+            text-decoration: none;
+        }
+        footer {
+            padding: 30px;
+            text-align: center;
+            color: rgba(245,239,225,0.6);
+            margin-top: 50px;
+        }
+        footer a { color: rgba(245,239,225,0.8); }
         .backup-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 100px 20px 40px;
         }
         .search-box {
             background: rgba(255,255,255,0.1);
