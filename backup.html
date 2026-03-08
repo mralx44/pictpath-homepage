@@ -8,6 +8,8 @@
     <link rel="icon" type="image/png" href="/pictpath-logo.png">
     <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Base styles in case external CSS doesn't load */
@@ -300,7 +302,11 @@
                     // Sort trips by date (newest first)
                     trips.sort((a, b) => new Date(b.date) - new Date(a.date));
                     
-                    for (const trip of trips) {
+                    // Store trips globally for click handler
+                    window.loadedTrips = trips;
+                    
+                    for (let i = 0; i < trips.length; i++) {
+                        const trip = trips[i];
                         const tripDate = new Date(trip.date).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
@@ -312,7 +318,7 @@
                         const speed = trip.averageSpeed ? trip.averageSpeed.toFixed(1) + ' km/h' : '-';
                         
                         html += `
-                            <div class="trip-card">
+                            <div class="trip-card" onclick="showTripDetail(window.loadedTrips[${i}])">
                                 <h4>${trip.name || 'Unnamed Trip'}</h4>
                                 <div class="stats">
                                     <span>📅 ${tripDate}</span>
@@ -346,6 +352,317 @@
             }
             return `${minutes}m`;
         }
+        
+        // Trip detail view
+        let currentTrip = null;
+        let tripMap = null;
+        
+        function showTripDetail(trip) {
+            currentTrip = trip;
+            document.getElementById('tripModal').style.display = 'flex';
+            document.getElementById('modalTripName').textContent = trip.name || 'Unnamed Trip';
+            document.getElementById('modalTripDate').textContent = new Date(trip.date).toLocaleDateString();
+            
+            // Stats
+            document.getElementById('modalStats').innerHTML = `
+                <div class="modal-stat">
+                    <span class="stat-label">Distance</span>
+                    <span class="stat-value">${trip.distance ? trip.distance.toFixed(2) : 0} km</span>
+                </div>
+                <div class="modal-stat">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value">${formatDuration(trip.duration || 0)}</span>
+                </div>
+                <div class="modal-stat">
+                    <span class="stat-label">Photos</span>
+                    <span class="stat-value">${trip.photoCount || 0}</span>
+                </div>
+                <div class="modal-stat">
+                    <span class="stat-label">Avg Speed</span>
+                    <span class="stat-value">${trip.averageSpeed ? trip.averageSpeed.toFixed(1) : 0} km/h</span>
+                </div>
+            `;
+            
+            // Initialize map
+            setTimeout(() => {
+                initTripMap(trip);
+            }, 100);
+            
+            // Render photos
+            renderPhotos(trip);
+        }
+        
+        function closeTripModal() {
+            document.getElementById('tripModal').style.display = 'none';
+            if (tripMap) {
+                tripMap.remove();
+                tripMap = null;
+            }
+        }
+        
+        function initTripMap(trip) {
+            const mapContainer = document.getElementById('tripMapContainer');
+            mapContainer.innerHTML = '<div id="tripMap" style="height: 100%; width: 100%;"></div>';
+            
+            // Check if we have GPS track
+            const gpsTrack = trip.gpsTrack || [];
+            const photos = trip.photos || [];
+            
+            // Find center point
+            let centerLat = 59.9139; // Default Oslo
+            let centerLng = 10.7522;
+            let hasCoords = false;
+            
+            if (gpsTrack.length > 0) {
+                centerLat = gpsTrack[0].latitude || gpsTrack[0].lat;
+                centerLng = gpsTrack[0].longitude || gpsTrack[0].lng || gpsTrack[0].lon;
+                hasCoords = true;
+            } else if (photos.length > 0 && photos[0].latitude) {
+                centerLat = photos[0].latitude;
+                centerLng = photos[0].longitude;
+                hasCoords = true;
+            }
+            
+            tripMap = L.map('tripMap').setView([centerLat, centerLng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(tripMap);
+            
+            // Draw GPS track
+            if (gpsTrack.length > 1) {
+                const trackCoords = gpsTrack.map(p => [
+                    p.latitude || p.lat,
+                    p.longitude || p.lng || p.lon
+                ]).filter(c => c[0] && c[1]);
+                
+                if (trackCoords.length > 1) {
+                    const polyline = L.polyline(trackCoords, { 
+                        color: '#3498db', 
+                        weight: 4,
+                        opacity: 0.8 
+                    }).addTo(tripMap);
+                    tripMap.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+                }
+            }
+            
+            // Add photo markers
+            photos.forEach((photo, index) => {
+                if (photo.latitude && photo.longitude) {
+                    const marker = L.marker([photo.latitude, photo.longitude], {
+                        icon: L.divIcon({
+                            className: 'photo-marker',
+                            html: '<div style="background: #e74c3c; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">📷</div>',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        })
+                    }).addTo(tripMap);
+                    
+                    if (photo.uri) {
+                        marker.bindPopup(`<img src="${photo.uri}" style="max-width: 200px; max-height: 150px; border-radius: 8px;" />`);
+                    }
+                }
+            });
+            
+            if (!hasCoords) {
+                mapContainer.innerHTML = '<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #666;">No GPS data available for this trip</div>';
+            }
+        }
+        
+        function renderPhotos(trip) {
+            const photosContainer = document.getElementById('tripPhotos');
+            const photos = trip.photos || [];
+            
+            if (photos.length === 0) {
+                photosContainer.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos in this trip</p>';
+                return;
+            }
+            
+            photosContainer.innerHTML = photos.map((photo, index) => `
+                <div class="photo-item" onclick="openPhoto(${index})">
+                    <img src="${photo.uri || photo.thumbnail || ''}" alt="Trip photo" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#999;\\'>📷</div>'" />
+                </div>
+            `).join('');
+        }
+        
+        function openPhoto(index) {
+            if (!currentTrip || !currentTrip.photos || !currentTrip.photos[index]) return;
+            const photo = currentTrip.photos[index];
+            const photoModal = document.getElementById('photoModal');
+            photoModal.style.display = 'flex';
+            document.getElementById('fullPhoto').src = photo.uri || '';
+        }
+        
+        function closePhotoModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+        
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeTripModal();
+                closePhotoModal();
+            }
+        });
     </script>
+    
+    <!-- Trip Detail Modal -->
+    <div id="tripModal" class="trip-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeTripModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTripName">Trip Name</h2>
+                <span id="modalTripDate" class="modal-date"></span>
+            </div>
+            <div id="modalStats" class="modal-stats"></div>
+            <div class="modal-section">
+                <h3>Route Map</h3>
+                <div id="tripMapContainer" class="trip-map-container"></div>
+            </div>
+            <div class="modal-section">
+                <h3>Photos</h3>
+                <div id="tripPhotos" class="photos-grid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Photo Fullscreen Modal -->
+    <div id="photoModal" class="photo-modal" style="display: none;" onclick="closePhotoModal()">
+        <img id="fullPhoto" src="" alt="Full size photo" />
+    </div>
+    
+    <style>
+        .trip-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 30px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .modal-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .modal-stat {
+            text-align: center;
+        }
+        .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        .modal-section {
+            margin-bottom: 25px;
+        }
+        .modal-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+        .trip-map-container {
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #f0f0f0;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+        .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            cursor: pointer;
+        }
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        .trip-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .trip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+    </style>
 </body>
 </html>
