@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Your Backup - PictPath</title>
     <meta name="description" content="View your PictPath cloud backup trips">
-    <link rel="icon" type="image/png" href="pictpath-logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/pictpath-logo.png">
+    <link rel="stylesheet" href="/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .backup-container {
@@ -134,13 +134,13 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-content">
-            <a href="index.html" class="logo">
-                <img src="pictpath-logo.png" alt="PictPath Logo" style="height: 40px;">
+            <a href="/" class="logo">
+                <img src="/pictpath-logo.png" alt="PictPath Logo" style="height: 40px;">
                 <span>PictPath</span>
             </a>
             <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="login.html" style="background: #f5efe1; color: #0d4532; padding: 8px 16px; border-radius: 6px; font-weight: 600;">Sign In</a>
+                <a href="/">Home</a>
+                <a href="/login" style="background: #f5efe1; color: #0d4532; padding: 8px 16px; border-radius: 6px; font-weight: 600;">Sign In</a>
             </div>
         </div>
     </nav>
@@ -176,7 +176,8 @@
         const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client created');
         
         // Check URL for backup ID
         const urlParams = new URLSearchParams(window.location.search);
@@ -192,8 +193,11 @@
         }
         
         async function loadBackup() {
+            console.log('loadBackup called');
             const backupId = document.getElementById('backupIdInput').value.trim();
             const resultsContainer = document.getElementById('resultsContainer');
+            
+            console.log('Backup ID:', backupId);
             
             if (!backupId) {
                 resultsContainer.innerHTML = '<div class="error-message">Please enter a backup ID</div>';
@@ -203,11 +207,14 @@
             resultsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading your trips...</div>';
             
             try {
+                console.log('Fetching from Supabase...');
                 const { data, error } = await supabase
                     .from('trip_backups')
                     .select('*')
                     .eq('user_id', backupId)
                     .single();
+                
+                console.log('Supabase response:', { data, error });
                 
                 if (error || !data) {
                     resultsContainer.innerHTML = '<div class="error-message">No backup found with this ID. Please check your Backup ID in the app.</div>';
