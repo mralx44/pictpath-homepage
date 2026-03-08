@@ -356,11 +356,15 @@
     </main>
 
     <script>
+        console.log('Script loaded!');
+        
         // Supabase config
         const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
         
+        console.log('Creating Supabase client...');
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client created:', supabase);
         
         // Check if already logged in or handle OAuth callback
         async function checkAuth() {
