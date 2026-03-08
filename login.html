@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PictPath</title>
     <meta name="description" content="Log in to your PictPath account to view and share your trips">
-    <link rel="icon" type="image/png" href="pictpath-logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/pictpath-logo.png">
+    <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -268,14 +268,14 @@
 <body>
     <!-- Navigation -->
     <nav class="nav-bar">
-        <a href="index.html" class="logo">
-            <img src="pictpath-logo.png" alt="PictPath">
+        <a href="/" class="logo">
+            <img src="/pictpath-logo.png" alt="PictPath">
             <span>PictPath</span>
         </a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="backup.html">My Backup</a>
-            <a href="privacy.html">Privacy</a>
+            <a href="/">Home</a>
+            <a href="/backup">My Backup</a>
+            <a href="/privacy">Privacy</a>
         </div>
     </nav>
 
@@ -363,15 +363,15 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
         
         console.log('Creating Supabase client...');
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client created:', supabase);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client created:', supabaseClient);
         
         // Check if already logged in or handle OAuth callback
         async function checkAuth() {
             // Handle OAuth callback (hash contains access_token)
             if (window.location.hash && window.location.hash.includes('access_token')) {
                 // Supabase will automatically parse the hash
-                const { data: { session }, error } = await supabase.auth.getSession();
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (session) {
                     // Create profile if it doesn't exist (for OAuth users)
                     await ensureProfile(session.user);
@@ -380,7 +380,7 @@
                 }
             }
             
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 window.location.href = 'dashboard.html';
             }
@@ -388,7 +388,7 @@
         
         // Ensure profile exists for OAuth users
         async function ensureProfile(user) {
-            const { data: existingProfile } = await supabase
+            const { data: existingProfile } = await supabaseClient
                 .from('profiles')
                 .select('id')
                 .eq('id', user.id)
@@ -400,7 +400,7 @@
                                 user.email?.split('@')[0] ||
                                 'user_' + user.id.substring(0, 8);
                 
-                await supabase.from('profiles').insert({
+                await supabaseClient.from('profiles').insert({
                     id: user.id,
                     username: username,
                     created_at: new Date().toISOString()
@@ -417,7 +417,7 @@
             
             try {
                 console.log('Calling Supabase OAuth...');
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
                         redirectTo: window.location.origin + '/login'
@@ -449,7 +449,7 @@
             btn.innerHTML = '<span class="loading-spinner"></span>Connecting...';
             
             try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'apple',
                     options: {
                         redirectTo: window.location.origin + '/login'
@@ -528,7 +528,7 @@
             setLoading('loginBtn', true);
             
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email,
                     password
                 });
@@ -585,7 +585,7 @@
                 }
                 
                 // Create account
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email,
                     password,
                     options: {
@@ -604,7 +604,7 @@
                 
                 // Create profile
                 if (data.user) {
-                    await supabase.from('profiles').upsert({
+                    await supabaseClient.from('profiles').upsert({
                         id: data.user.id,
                         username: username.toLowerCase(),
                         display_name: username,
