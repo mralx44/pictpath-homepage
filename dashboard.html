@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Trips - PictPath</title>
     <meta name="description" content="View and share your PictPath trips">
-    <link rel="icon" type="image/png" href="pictpath-logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/pictpath-logo.png">
+    <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -358,12 +358,12 @@
 <body>
     <!-- Navigation -->
     <nav class="nav-bar">
-        <a href="index.html" class="logo">
-            <img src="pictpath-logo.png" alt="PictPath">
+        <a href="/" class="logo">
+            <img src="/pictpath-logo.png" alt="PictPath">
             <span>PictPath</span>
         </a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
+            <a href="/">Home</a>
             <div class="user-avatar" id="userAvatar">?</div>
             <button onclick="signOut()">Sign Out</button>
         </div>
@@ -515,13 +515,13 @@
             grid.innerHTML = currentTrips.map(trip => `
                 <div class="trip-card">
                     <div class="trip-card-header">
-                        <h3>${escapeHtml(trip.trip_name || 'Unnamed Trip')}</h3>
-                        <div class="date">${formatDate(trip.trip_date)}</div>
+                        <h3>${escapeHtml(trip.trip_name || trip.name || 'Unnamed Trip')}</h3>
+                        <div class="date">${formatDate(trip.trip_date || trip.date)}</div>
                     </div>
                     <div class="trip-card-stats">
                         <span>📸 ${trip.photo_count || 0} photos</span>
-                        <span>📍 ${(trip.distance_km || 0).toFixed(1)} km</span>
-                        <span>⏱️ ${formatDuration(trip.duration_seconds || 0)}</span>
+                        <span>📍 ${((trip.distance_km || trip.distance || 0)).toFixed(1)} km</span>
+                        <span>⏱️ ${formatDuration(trip.duration_seconds || trip.duration || 0)}</span>
                     </div>
                     <div class="trip-card-actions">
                         <button class="view-btn" onclick="viewTrip('${trip.id}')">View Map</button>
@@ -534,8 +534,8 @@
         function updateStats() {
             const totalTrips = currentTrips.length;
             const totalPhotos = currentTrips.reduce((sum, t) => sum + (t.photo_count || 0), 0);
-            const totalDistance = currentTrips.reduce((sum, t) => sum + (t.distance_km || 0), 0);
-            const totalDuration = currentTrips.reduce((sum, t) => sum + (t.duration_seconds || 0), 0);
+            const totalDistance = currentTrips.reduce((sum, t) => sum + (t.distance_km || t.distance || 0), 0);
+            const totalDuration = currentTrips.reduce((sum, t) => sum + (t.duration_seconds || t.duration || 0), 0);
             
             document.getElementById('totalTrips').textContent = totalTrips;
             document.getElementById('totalPhotos').textContent = totalPhotos;
