@@ -478,6 +478,25 @@
                 return;
             }
             
+            // Check if photos are local URIs (can't be displayed on web)
+            const hasCloudPhotos = photos.some(p => 
+                p.uri && (p.uri.startsWith('http://') || p.uri.startsWith('https://'))
+            );
+            
+            if (!hasCloudPhotos) {
+                photosContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; background: #f8f9fa; border-radius: 12px;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📱</div>
+                        <h4 style="margin: 0 0 10px 0; color: #333;">Photos stored locally</h4>
+                        <p style="color: #666; margin: 0; font-size: 14px;">
+                            This backup contains ${photos.length} photo${photos.length > 1 ? 's' : ''}, but they are stored on your device.<br><br>
+                            To view photos on the web, use the <strong>"Share Trip"</strong> feature in the app - this uploads photos to the cloud.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
             photosContainer.innerHTML = photos.map((photo, index) => `
                 <div class="photo-item" onclick="openPhoto(${index})">
                     <img src="${photo.uri || photo.thumbnail || ''}" alt="Trip photo" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#999;\\'>📷</div>'" />
