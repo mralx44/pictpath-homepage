@@ -230,20 +230,17 @@
         const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
         
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client created');
-        
-        // Check URL for backup ID
+        // Redirect to consolidated My Trips page
         const urlParams = new URLSearchParams(window.location.search);
         const urlBackupId = urlParams.get('id');
-        
-        // Also check path for /backup/ID format
         const pathMatch = window.location.pathname.match(/\/backup\/(.+)/);
         const pathBackupId = pathMatch ? pathMatch[1] : null;
+        const backupId = urlBackupId || pathBackupId;
         
-        if (urlBackupId || pathBackupId) {
-            document.getElementById('backupIdInput').value = urlBackupId || pathBackupId;
-            loadBackup();
+        if (backupId) {
+            window.location.replace('dashboard.html?id=' + encodeURIComponent(backupId));
+        } else {
+            window.location.replace('dashboard.html');
         }
         
         async function loadBackup() {

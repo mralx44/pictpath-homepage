@@ -8,6 +8,8 @@
     <link rel="icon" type="image/png" href="/pictpath-logo.png">
     <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .nav-bar {
@@ -353,6 +355,246 @@
             color: rgba(245,239,225,0.5);
             font-size: 12px;
         }
+        
+        /* Backup Section Styles */
+        .backup-search-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .backup-search-box h2 {
+            margin-bottom: 15px;
+            color: #f5efe1;
+        }
+        .backup-search-box input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: #f5efe1;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .backup-search-box input::placeholder {
+            color: rgba(245,239,225,0.5);
+        }
+        .backup-search-box button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: #f5efe1;
+            color: #0d4532;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .backup-search-box button:hover {
+            transform: scale(1.02);
+        }
+        
+        .backup-info-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .backup-info-card h3 {
+            color: #f5efe1;
+            margin-bottom: 10px;
+        }
+        .backup-info-card p {
+            color: rgba(245,239,225,0.7);
+            margin: 5px 0;
+        }
+        
+        .backup-trips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .backup-trip-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .backup-trip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .backup-trip-card h4 {
+            color: #f5efe1;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        .backup-trip-card .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: rgba(245,239,225,0.7);
+            font-size: 14px;
+        }
+        
+        /* Trip Detail Modal */
+        .trip-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .trip-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 30px;
+        }
+        .trip-modal-content .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+        }
+        .trip-modal-content .modal-close:hover { color: #333; }
+        .trip-modal-content .modal-header {
+            margin-bottom: 20px;
+        }
+        .trip-modal-content .modal-header h2 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .trip-modal-content .modal-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .modal-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .modal-stat-item {
+            text-align: center;
+        }
+        .modal-stat-item .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .modal-stat-item .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        .modal-section {
+            margin-bottom: 25px;
+        }
+        .modal-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+        .trip-map-container {
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #f0f0f0;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Photo Fullscreen Modal */
+        .photo-fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            cursor: pointer;
+        }
+        .photo-fullscreen-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        
+        .error-message {
+            background: rgba(255,100,100,0.2);
+            border: 1px solid rgba(255,100,100,0.5);
+            border-radius: 12px;
+            padding: 20px;
+            color: #f5efe1;
+            text-align: center;
+        }
+        .loading-backup {
+            text-align: center;
+            color: rgba(245,239,225,0.7);
+            padding: 40px;
+        }
+        .loading-spinner-backup {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(245,239,225,0.3);
+            border-top-color: #f5efe1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -364,8 +606,9 @@
         </a>
         <div class="nav-links">
             <a href="/">Home</a>
+            <a href="/login" id="signInLink">Sign In</a>
             <div class="user-avatar" id="userAvatar">?</div>
-            <button onclick="signOut()">Sign Out</button>
+            <button id="signOutBtn" onclick="signOut()" style="display: none;">Sign Out</button>
         </div>
     </nav>
 
@@ -413,7 +656,55 @@
                 </a>
             </div>
         </div>
+        
+        <!-- Backup Section (for anonymous backup viewing) -->
+        <div id="backupSection" style="display: none;">
+            <h1 style="text-align: center; margin: 40px 0; color: #f5efe1;">🗺️ My Trips</h1>
+            
+            <div class="backup-search-box" id="backupSearchBox">
+                <h2>Enter Your Backup ID</h2>
+                <p style="color: rgba(245,239,225,0.6); margin-bottom: 15px;">
+                    Find your Backup ID in the PictPath app: Settings → Cloud Backup → Copy Backup ID
+                </p>
+                <input type="text" id="backupIdInput" placeholder="anon_1234567890_abc123xyz" autocomplete="off">
+                <button onclick="loadBackup()">View My Trips</button>
+                <p class="help-text" style="text-align: center; color: rgba(245,239,225,0.5); font-size: 14px; margin-top: 15px;">
+                    Your backup ID stays on your device. We don't track who views what.
+                </p>
+                <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(245,239,225,0.2);">
+                    <p style="color: rgba(245,239,225,0.6); margin-bottom: 10px;">Have an account?</p>
+                    <a href="/login" style="color: #f5efe1; font-weight: 600;">Sign in to see synced trips →</a>
+                </div>
+            </div>
+            
+            <div id="backupResultsContainer"></div>
+        </div>
     </main>
+    
+    <!-- Trip Detail Modal -->
+    <div id="tripDetailModal" class="trip-modal" style="display: none;">
+        <div class="trip-modal-content">
+            <button class="modal-close" onclick="closeTripDetailModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="tripModalName">Trip Name</h2>
+                <span id="tripModalDate" class="modal-date"></span>
+            </div>
+            <div id="tripModalStats" class="modal-stats-grid"></div>
+            <div class="modal-section">
+                <h3>Route Map</h3>
+                <div id="tripMapContainer" class="trip-map-container"></div>
+            </div>
+            <div class="modal-section">
+                <h3>Photos</h3>
+                <div id="tripPhotosContainer" class="photos-grid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Photo Fullscreen Modal -->
+    <div id="photoFullModal" class="photo-fullscreen-modal" style="display: none;" onclick="closePhotoFullModal()">
+        <img id="fullPhotoImg" src="" alt="Full size photo" />
+    </div>
     
     <!-- Share Modal -->
     <div class="modal-overlay" id="shareModal" style="display: none;">
@@ -454,23 +745,57 @@
         let currentUser = null;
         let currentTrips = [];
         let selectedTrip = null;
+        let viewMode = 'account'; // 'account' or 'backup'
+        let tripMap = null;
+        let currentBackupTrip = null;
+        
+        // Check URL for backup ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlBackupId = urlParams.get('id');
         
         // Check auth and load data
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (!session) {
-                window.location.href = 'login.html';
+            // If backup ID in URL, show backup view
+            if (urlBackupId) {
+                viewMode = 'backup';
+                showBackupMode();
+                document.getElementById('backupIdInput').value = urlBackupId;
+                await loadBackup();
                 return;
             }
             
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                // Not logged in - show backup mode
+                viewMode = 'backup';
+                showBackupMode();
+                return;
+            }
+            
+            viewMode = 'account';
             currentUser = session.user;
             
-            // Update avatar
+            // Update avatar and show sign out
             document.getElementById('userAvatar').textContent = 
                 (currentUser.email || '?')[0].toUpperCase();
+            document.getElementById('signOutBtn').style.display = 'block';
+            document.getElementById('signInLink').style.display = 'none';
             
             await loadTrips();
+        }
+        
+        function showBackupMode() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('backupSection').style.display = 'block';
+            document.getElementById('signOutBtn').style.display = 'none';
+            document.getElementById('userAvatar').textContent = '?';
+        }
+        
+        function showAccountMode() {
+            document.getElementById('backupSection').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
         }
         
         async function loadTrips() {
@@ -696,6 +1021,280 @@
         // Close modal on outside click
         document.getElementById('shareModal').addEventListener('click', (e) => {
             if (e.target.id === 'shareModal') {
+                closeShareModal();
+            }
+        });
+        
+        // ==========================================
+        // BACKUP FUNCTIONS
+        // ==========================================
+        
+        async function loadBackup() {
+            const backupId = document.getElementById('backupIdInput').value.trim();
+            const resultsContainer = document.getElementById('backupResultsContainer');
+            
+            if (!backupId) {
+                resultsContainer.innerHTML = '<div class="error-message">Please enter a backup ID</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = '<div class="loading-backup"><div class="loading-spinner-backup"></div>Loading your trips...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('trip_backups')
+                    .select('*')
+                    .eq('user_id', backupId)
+                    .single();
+                
+                if (error || !data) {
+                    resultsContainer.innerHTML = '<div class="error-message">No backup found with this ID. Please check your Backup ID in the app.</div>';
+                    return;
+                }
+                
+                const trips = data.trips_data || [];
+                const backupDate = new Date(data.backup_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Store trips globally
+                window.loadedBackupTrips = trips;
+                
+                let html = `
+                    <div class="backup-info-card">
+                        <h3>📱 Backup from ${data.device_name || 'Unknown Device'}</h3>
+                        <p>Last backup: ${backupDate}</p>
+                        <p>Total trips: ${trips.length}</p>
+                        <p>App version: ${data.app_version || 'Unknown'}</p>
+                    </div>
+                    <h3 style="color: #f5efe1; margin-bottom: 15px;">Your Trips</h3>
+                    <div class="backup-trips-list">
+                `;
+                
+                if (trips.length === 0) {
+                    html += '<div class="backup-trip-card"><p style="color: rgba(245,239,225,0.7);">No trips in this backup yet.</p></div>';
+                } else {
+                    trips.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    for (let i = 0; i < trips.length; i++) {
+                        const trip = trips[i];
+                        const tripDate = new Date(trip.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        
+                        const duration = trip.duration ? formatDurationBackup(trip.duration) : '-';
+                        const distance = trip.distance ? trip.distance.toFixed(2) + ' km' : '-';
+                        const speed = trip.averageSpeed ? trip.averageSpeed.toFixed(1) + ' km/h' : '-';
+                        
+                        html += `
+                            <div class="backup-trip-card" onclick="showBackupTripDetail(${i})">
+                                <h4>${escapeHtml(trip.name || 'Unnamed Trip')}</h4>
+                                <div class="stats">
+                                    <span>📅 ${tripDate}</span>
+                                    <span>📸 ${trip.photoCount || 0} photos</span>
+                                    <span>⏱️ ${duration}</span>
+                                    <span>📍 ${distance}</span>
+                                    <span>🚀 ${speed}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+                
+                // Hide search box
+                document.getElementById('backupSearchBox').style.display = 'none';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                resultsContainer.innerHTML = '<div class="error-message">Error loading backup. Please try again.</div>';
+            }
+        }
+        
+        function formatDurationBackup(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
+        }
+        
+        function showBackupTripDetail(index) {
+            const trip = window.loadedBackupTrips[index];
+            if (!trip) return;
+            
+            currentBackupTrip = trip;
+            
+            document.getElementById('tripDetailModal').style.display = 'flex';
+            document.getElementById('tripModalName').textContent = trip.name || 'Unnamed Trip';
+            document.getElementById('tripModalDate').textContent = new Date(trip.date).toLocaleDateString();
+            
+            // Stats
+            document.getElementById('tripModalStats').innerHTML = `
+                <div class="modal-stat-item">
+                    <span class="stat-label">Distance</span>
+                    <span class="stat-value">${trip.distance ? trip.distance.toFixed(2) : 0} km</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value">${formatDurationBackup(trip.duration || 0)}</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Photos</span>
+                    <span class="stat-value">${trip.photoCount || 0}</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Avg Speed</span>
+                    <span class="stat-value">${trip.averageSpeed ? trip.averageSpeed.toFixed(1) : 0} km/h</span>
+                </div>
+            `;
+            
+            // Initialize map
+            setTimeout(() => {
+                initBackupTripMap(trip);
+            }, 100);
+            
+            // Render photos
+            renderBackupPhotos(trip);
+        }
+        
+        function closeTripDetailModal() {
+            document.getElementById('tripDetailModal').style.display = 'none';
+            if (tripMap) {
+                tripMap.remove();
+                tripMap = null;
+            }
+        }
+        
+        function initBackupTripMap(trip) {
+            const mapContainer = document.getElementById('tripMapContainer');
+            mapContainer.innerHTML = '<div id="tripMapLeaflet" style="height: 100%; width: 100%;"></div>';
+            
+            const gpsTrack = trip.gpsTrack || [];
+            const photos = trip.photos || [];
+            
+            let centerLat = 59.9139;
+            let centerLng = 10.7522;
+            let hasCoords = false;
+            
+            if (gpsTrack.length > 0) {
+                centerLat = gpsTrack[0].latitude || gpsTrack[0].lat;
+                centerLng = gpsTrack[0].longitude || gpsTrack[0].lng || gpsTrack[0].lon;
+                hasCoords = true;
+            } else if (photos.length > 0 && photos[0].latitude) {
+                centerLat = photos[0].latitude;
+                centerLng = photos[0].longitude;
+                hasCoords = true;
+            }
+            
+            if (!hasCoords) {
+                mapContainer.innerHTML = '<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #666;">No GPS data available for this trip</div>';
+                return;
+            }
+            
+            tripMap = L.map('tripMapLeaflet').setView([centerLat, centerLng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(tripMap);
+            
+            // Draw GPS track
+            if (gpsTrack.length > 1) {
+                const trackCoords = gpsTrack.map(p => [
+                    p.latitude || p.lat,
+                    p.longitude || p.lng || p.lon
+                ]).filter(c => c[0] && c[1]);
+                
+                if (trackCoords.length > 1) {
+                    const polyline = L.polyline(trackCoords, { 
+                        color: '#3498db', 
+                        weight: 4,
+                        opacity: 0.8 
+                    }).addTo(tripMap);
+                    tripMap.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+                }
+            }
+            
+            // Add photo markers
+            photos.forEach((photo, index) => {
+                if (photo.latitude && photo.longitude) {
+                    const marker = L.marker([photo.latitude, photo.longitude], {
+                        icon: L.divIcon({
+                            className: 'photo-marker',
+                            html: '<div style="background: #e74c3c; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">📷</div>',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        })
+                    }).addTo(tripMap);
+                    
+                    if (photo.uri && (photo.uri.startsWith('http://') || photo.uri.startsWith('https://'))) {
+                        marker.bindPopup(`<img src="${photo.uri}" style="max-width: 200px; max-height: 150px; border-radius: 8px;" />`);
+                    }
+                }
+            });
+        }
+        
+        function renderBackupPhotos(trip) {
+            const photosContainer = document.getElementById('tripPhotosContainer');
+            const photos = trip.photos || [];
+            
+            if (photos.length === 0) {
+                photosContainer.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos in this trip</p>';
+                return;
+            }
+            
+            const hasCloudPhotos = photos.some(p => 
+                p.uri && (p.uri.startsWith('http://') || p.uri.startsWith('https://'))
+            );
+            
+            if (!hasCloudPhotos) {
+                photosContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; background: #f8f9fa; border-radius: 12px;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📱</div>
+                        <h4 style="margin: 0 0 10px 0; color: #333;">Photos stored locally</h4>
+                        <p style="color: #666; margin: 0; font-size: 14px;">
+                            This backup contains ${photos.length} photo${photos.length > 1 ? 's' : ''}, but they are stored on your device.<br><br>
+                            To view photos on the web, use <strong>"Backup with Photos"</strong> in the app.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            photosContainer.innerHTML = photos.map((photo, index) => `
+                <div class="photo-item" onclick="openBackupPhoto(${index})">
+                    <img src="${photo.uri || ''}" alt="Trip photo" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#999;\\'>📷</div>'" />
+                </div>
+            `).join('');
+        }
+        
+        function openBackupPhoto(index) {
+            if (!currentBackupTrip || !currentBackupTrip.photos || !currentBackupTrip.photos[index]) return;
+            const photo = currentBackupTrip.photos[index];
+            if (!photo.uri || (!photo.uri.startsWith('http://') && !photo.uri.startsWith('https://'))) return;
+            
+            document.getElementById('photoFullModal').style.display = 'flex';
+            document.getElementById('fullPhotoImg').src = photo.uri;
+        }
+        
+        function closePhotoFullModal() {
+            document.getElementById('photoFullModal').style.display = 'none';
+        }
+        
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeTripDetailModal();
+                closePhotoFullModal();
                 closeShareModal();
             }
         });
