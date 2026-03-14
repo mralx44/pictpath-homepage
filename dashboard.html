@@ -737,7 +737,7 @@
 
     <script>
         // Supabase config
-        const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabaseClient.co';
+        const SUPABASE_URL = 'https://aiyaqjveeqdeqllkddyp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpeWFxanZlZXFkZXFsbGtkZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNTI1MTQsImV4cCI6MjA4MTcyODUxNH0.gOpdbdx5i6qgJ_szRcsTDI1SlS_6-2MXBP0lzhTPgwM';
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -801,7 +801,7 @@
         async function loadTrips() {
             try {
                 // Load trips from user_trips table
-                const { data: trips, error } = await supabase
+                const { data: trips, error } = await supabaseClient
                     .from('user_trips')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -919,7 +919,7 @@
                 const shareId = generateShareId();
                 
                 // Update trip with share ID
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('user_trips')
                     .update({ share_id: shareId, is_public: true })
                     .eq('id', tripId);
@@ -954,7 +954,7 @@
             
             const newValue = !selectedTrip.is_public;
             
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('user_trips')
                 .update({ is_public: newValue })
                 .eq('id', selectedTrip.id);
@@ -1041,7 +1041,7 @@
             resultsContainer.innerHTML = '<div class="loading-backup"><div class="loading-spinner-backup"></div>Loading your trips...</div>';
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('trip_backups')
                     .select('*')
                     .eq('user_id', backupId)
