@@ -274,7 +274,7 @@
         </a>
         <div class="nav-links">
             <a href="/">Home</a>
-            <a href="/backup">My Backup</a>
+            <a href="/dashboard">My Trips</a>
             <a href="/privacy">Privacy</a>
         </div>
     </nav>
@@ -368,21 +368,38 @@
         
         // Check if already logged in or handle OAuth callback
         async function checkAuth() {
-            // Handle OAuth callback (hash contains access_token)
-            if (window.location.hash && window.location.hash.includes('access_token')) {
-                // Supabase will automatically parse the hash
+            console.log('checkAuth called, URL:', window.location.href);
+            
+            // Handle OAuth callback - check for code in URL (PKCE flow) or hash (implicit flow)
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const hashHasToken = window.location.hash && window.location.hash.includes('access_token');
+            
+            if (code || hashHasToken) {
+                console.log('OAuth callback detected, code:', code, 'hash:', hashHasToken);
+                
+                // Wait a moment for Supabase to process the callback
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
+                console.log('Session after callback:', session, 'Error:', error);
+                
                 if (session) {
                     // Create profile if it doesn't exist (for OAuth users)
                     await ensureProfile(session.user);
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/dashboard';
                     return;
+                } else if (error) {
+                    console.error('Auth error:', error);
+                    showError('Login failed: ' + error.message);
                 }
             }
             
+            // Check existing session
             const { data: { session } } = await supabaseClient.auth.getSession();
+            console.log('Existing session check:', session);
             if (session) {
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard';
             }
         }
         
@@ -420,7 +437,11 @@
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/login'
+                        redirectTo: window.location.origin + '/login',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
                     }
                 });
                 
