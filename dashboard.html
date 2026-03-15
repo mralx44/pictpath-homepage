@@ -759,18 +759,23 @@
         const urlParams = new URLSearchParams(window.location.search);
         const urlBackupId = urlParams.get('id');
         
+        // Store backup ID in localStorage if present in URL
+        if (urlBackupId) {
+            localStorage.setItem('pictpath_backup_id', urlBackupId);
+        }
+        
         // Check auth and load data
         async function init() {
-            // If backup ID in URL, show backup view
-            if (urlBackupId) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            // If backup ID in URL and NOT logged in, show backup view
+            if (urlBackupId && !session) {
                 viewMode = 'backup';
                 showBackupMode();
                 document.getElementById('backupIdInput').value = urlBackupId;
                 await loadBackup();
                 return;
             }
-            
-            const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (!session) {
                 // Not logged in - show backup mode
@@ -788,7 +793,33 @@
             document.getElementById('signOutBtn').style.display = 'block';
             document.getElementById('signInLink').style.display = 'none';
             
+            // If we have a backup ID (from URL or localStorage), link it to this account
+            const storedBackupId = urlBackupId || localStorage.getItem('pictpath_backup_id');
+            if (storedBackupId) {
+                await linkBackupToAccount(storedBackupId);
+            }
+            
             await loadTrips();
+        }
+        
+        // Link a backup to the current logged-in user account
+        async function linkBackupToAccount(backupId) {
+            try {
+                // Update the backup to link it to this auth user
+                const { error } = await supabaseClient
+                    .from('trip_backups')
+                    .update({ auth_user_id: currentUser.id })
+                    .eq('user_id', backupId)
+                    .is('auth_user_id', null); // Only update if not already linked
+                
+                if (!error) {
+                    console.log('Backup linked to account successfully');
+                    // Clear stored backup ID since it's now linked
+                    localStorage.removeItem('pictpath_backup_id');
+                }
+            } catch (err) {
+                console.log('Could not link backup:', err);
+            }
         }
         
         function showBackupMode() {
