@@ -131,6 +131,26 @@
         .trip-card:hover {
             transform: translateY(-5px);
         }
+        .trip-card-preview {
+            width: 100%;
+            height: 160px;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .trip-card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .trip-card-preview .no-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(245,239,225,0.3);
+            font-size: 48px;
+        }
         .trip-card-header {
             padding: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -1003,8 +1023,27 @@
         // Render a specific array of trips
         function renderTripsArray(trips) {
             const grid = document.getElementById('tripsGrid');
-            grid.innerHTML = trips.map(trip => `
+            grid.innerHTML = trips.map(trip => {
+                // Find first valid photo URL for preview
+                let previewUrl = null;
+                if (trip.photos && trip.photos.length > 0) {
+                    for (const photo of trip.photos) {
+                        const url = photo.uri || photo.url || photo;
+                        if (typeof url === 'string' && url.startsWith('http')) {
+                            previewUrl = url;
+                            break;
+                        }
+                    }
+                }
+                
+                return `
                 <div class="trip-card">
+                    <div class="trip-card-preview">
+                        ${previewUrl 
+                            ? `<img src="${previewUrl}" alt="Trip preview" loading="lazy">` 
+                            : '<div class="no-preview">🗺️</div>'
+                        }
+                    </div>
                     <div class="trip-card-header">
                         <h3>${escapeHtml(trip.trip_name || trip.name || 'Unnamed Trip')}</h3>
                         <div class="date">${formatDate(trip.trip_date || trip.date)}</div>
@@ -1019,7 +1058,8 @@
                         <button class="share-btn" onclick="openShareModal('${trip.id}')">Share</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         // View trip details with map and photos
