@@ -806,18 +806,48 @@
         
         async function loadTrips() {
             try {
-                // Load trips from user_trips table
-                const { data: trips, error } = await supabaseClient
-                    .from('user_trips')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('trip_date', { ascending: false });
+                // First try to load from trip_backups (backup data linked to auth user)
+                const { data: backupData, error: backupError } = await supabaseClient
+                    .from('trip_backups')
+                    .select('trips_data, backup_date, device_name')
+                    .eq('auth_user_id', currentUser.id)
+                    .single();
                 
-                if (error) {
-                    console.error('Error loading trips:', error);
+                if (backupData && backupData.trips_data && backupData.trips_data.length > 0) {
+                    // Transform backup trips to match expected format
+                    currentTrips = backupData.trips_data.map((trip, index) => ({
+                        id: trip.id || `backup_${index}`,
+                        trip_name: trip.name,
+                        name: trip.name,
+                        trip_date: trip.date,
+                        date: trip.date,
+                        photo_count: trip.photoCount || trip.photos?.length || 0,
+                        photos: trip.photos || [],
+                        gps_track: trip.gpsTrack || [],
+                        distance_km: trip.distance || 0,
+                        distance: trip.distance || 0,
+                        duration_seconds: trip.duration || 0,
+                        duration: trip.duration || 0,
+                        average_speed_kmh: trip.averageSpeed || 0,
+                        weather: trip.weather,
+                        is_public: false,
+                        isFromBackup: true,
+                    }));
+                    // Sort by date descending
+                    currentTrips.sort((a, b) => new Date(b.trip_date || b.date) - new Date(a.trip_date || a.date));
+                } else {
+                    // Fallback: try user_trips table
+                    const { data: trips, error } = await supabaseClient
+                        .from('user_trips')
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .order('trip_date', { ascending: false });
+                    
+                    if (error) {
+                        console.error('Error loading trips:', error);
+                    }
+                    currentTrips = trips || [];
                 }
-                
-                currentTrips = trips || [];
                 
                 // Hide loading, show content
                 document.getElementById('loadingScreen').style.display = 'none';
