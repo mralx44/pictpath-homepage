@@ -584,6 +584,33 @@
             color: #f5efe1;
             text-align: center;
         }
+        
+        /* Search bar */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: #f5efe1;
+            font-size: 16px;
+            outline: none;
+            transition: background 0.2s;
+        }
+        .search-input::placeholder {
+            color: rgba(245,239,225,0.5);
+        }
+        .search-input:focus {
+            background: rgba(255,255,255,0.15);
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: rgba(245,239,225,0.6);
+        }
         .loading-backup {
             text-align: center;
             color: rgba(245,239,225,0.7);
@@ -629,6 +656,10 @@
         <div id="dashboardContent" style="display: none;">
             <div class="dashboard-header">
                 <h1>🗺️ My Trips</h1>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search trips by name..." oninput="filterTrips()">
             </div>
             
             <div class="stats-row" id="statsRow">
@@ -903,24 +934,7 @@
         }
         
         function renderTrips() {
-            const grid = document.getElementById('tripsGrid');
-            grid.innerHTML = currentTrips.map(trip => `
-                <div class="trip-card">
-                    <div class="trip-card-header">
-                        <h3>${escapeHtml(trip.trip_name || trip.name || 'Unnamed Trip')}</h3>
-                        <div class="date">${formatDate(trip.trip_date || trip.date)}</div>
-                    </div>
-                    <div class="trip-card-stats">
-                        <span>📸 ${trip.photo_count || 0} photos</span>
-                        <span>📍 ${((trip.distance_km || trip.distance || 0)).toFixed(1)} km</span>
-                        <span>⏱️ ${formatDuration(trip.duration_seconds || trip.duration || 0)}</span>
-                    </div>
-                    <div class="trip-card-actions">
-                        <button class="view-btn" onclick="viewTrip('${trip.id}')">View Map</button>
-                        <button class="share-btn" onclick="openShareModal('${trip.id}')">Share</button>
-                    </div>
-                </div>
-            `).join('');
+            renderTripsArray(currentTrips);
         }
         
         function updateStats() {
@@ -964,15 +978,156 @@
             return div.innerHTML;
         }
         
-        // View trip on map (using shared trips viewer)
+        // Filter trips based on search
+        function filterTrips() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const grid = document.getElementById('tripsGrid');
+            
+            if (!query) {
+                renderTrips();
+                return;
+            }
+            
+            const filtered = currentTrips.filter(trip => {
+                const name = (trip.trip_name || trip.name || '').toLowerCase();
+                return name.includes(query);
+            });
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="no-results"><p>No trips matching "' + escapeHtml(query) + '"</p></div>';
+            } else {
+                renderTripsArray(filtered);
+            }
+        }
+        
+        // Render a specific array of trips
+        function renderTripsArray(trips) {
+            const grid = document.getElementById('tripsGrid');
+            grid.innerHTML = trips.map(trip => `
+                <div class="trip-card">
+                    <div class="trip-card-header">
+                        <h3>${escapeHtml(trip.trip_name || trip.name || 'Unnamed Trip')}</h3>
+                        <div class="date">${formatDate(trip.trip_date || trip.date)}</div>
+                    </div>
+                    <div class="trip-card-stats">
+                        <span>📸 ${trip.photo_count || 0} photos</span>
+                        <span>📍 ${((trip.distance_km || trip.distance || 0)).toFixed(1)} km</span>
+                        <span>⏱️ ${formatDuration(trip.duration_seconds || trip.duration || 0)}</span>
+                    </div>
+                    <div class="trip-card-actions">
+                        <button class="view-btn" onclick="viewTrip('${trip.id}')">View Map</button>
+                        <button class="share-btn" onclick="openShareModal('${trip.id}')">Share</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // View trip details with map and photos
         function viewTrip(tripId) {
             const trip = currentTrips.find(t => t.id === tripId);
-            if (trip && trip.share_id) {
-                window.open(`https://pictpath-web.vercel.app/trip/${trip.share_id}`, '_blank');
+            if (!trip) return;
+            
+            // Show the trip detail modal
+            document.getElementById('tripModalName').textContent = trip.trip_name || trip.name || 'Unnamed Trip';
+            document.getElementById('tripModalDate').textContent = formatDate(trip.trip_date || trip.date);
+            
+            // Stats
+            const duration = trip.duration_seconds || trip.duration || 0;
+            const distance = trip.distance_km || trip.distance || 0;
+            const speed = trip.average_speed_kmh || trip.averageSpeed || 0;
+            const photos = trip.photo_count || (trip.photos ? trip.photos.length : 0);
+            
+            document.getElementById('tripModalStats').innerHTML = `
+                <div class="modal-stat-item">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value">${formatDuration(duration)}</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Distance</span>
+                    <span class="stat-value">${distance.toFixed(1)} km</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Avg Speed</span>
+                    <span class="stat-value">${speed.toFixed(1)} km/h</span>
+                </div>
+                <div class="modal-stat-item">
+                    <span class="stat-label">Photos</span>
+                    <span class="stat-value">${photos}</span>
+                </div>
+                ${trip.weather ? `
+                <div class="modal-stat-item">
+                    <span class="stat-label">Weather</span>
+                    <span class="stat-value">${trip.weather.temperature}°C ${trip.weather.condition}</span>
+                </div>
+                ` : ''}
+            `;
+            
+            // Show map with GPS track
+            const mapContainer = document.getElementById('tripMapContainer');
+            mapContainer.innerHTML = '';
+            
+            const gpsTrack = trip.gps_track || trip.gpsTrack || [];
+            if (gpsTrack.length > 0) {
+                // Create map
+                if (tripMap) tripMap.remove();
+                tripMap = L.map(mapContainer).setView([gpsTrack[0].latitude, gpsTrack[0].longitude], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(tripMap);
+                
+                // Draw route
+                const coordinates = gpsTrack.map(p => [p.latitude, p.longitude]);
+                const polyline = L.polyline(coordinates, { color: '#0d4532', weight: 4 }).addTo(tripMap);
+                tripMap.fitBounds(polyline.getBounds(), { padding: [20, 20] });
+                
+                // Add start/end markers
+                L.marker(coordinates[0]).addTo(tripMap).bindPopup('Start');
+                L.marker(coordinates[coordinates.length - 1]).addTo(tripMap).bindPopup('End');
             } else {
-                // Create a share first
-                openShareModal(tripId);
+                mapContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">No GPS data available</div>';
             }
+            
+            // Show photos
+            const photosContainer = document.getElementById('tripPhotosContainer');
+            const tripPhotos = trip.photos || [];
+            
+            if (tripPhotos.length > 0) {
+                photosContainer.innerHTML = tripPhotos.map((photo, index) => {
+                    const photoUrl = photo.uri || photo.url || photo;
+                    if (typeof photoUrl === 'string' && photoUrl.startsWith('http')) {
+                        return `<div class="photo-item" onclick="openPhotoFullscreen('${photoUrl}')">
+                            <img src="${photoUrl}" alt="Trip photo ${index + 1}" loading="lazy">
+                        </div>`;
+                    }
+                    return '';
+                }).join('') || '<p style="color: #666;">Photos are stored locally on device</p>';
+            } else {
+                photosContainer.innerHTML = '<p style="color: #666;">No photos for this trip</p>';
+            }
+            
+            document.getElementById('tripDetailModal').style.display = 'flex';
+            
+            // Re-render map after modal is visible
+            setTimeout(() => {
+                if (tripMap) tripMap.invalidateSize();
+            }, 100);
+        }
+        
+        function closeTripDetailModal() {
+            document.getElementById('tripDetailModal').style.display = 'none';
+            if (tripMap) {
+                tripMap.remove();
+                tripMap = null;
+            }
+        }
+        
+        function openPhotoFullscreen(url) {
+            document.getElementById('fullPhotoImg').src = url;
+            document.getElementById('photoFullModal').style.display = 'flex';
+        }
+        
+        function closePhotoFullModal() {
+            document.getElementById('photoFullModal').style.display = 'none';
         }
         
         // Share Modal
