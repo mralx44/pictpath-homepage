@@ -381,17 +381,34 @@
             const code = urlParams.get('code');
             const hashHasToken = window.location.hash && window.location.hash.includes('access_token');
             
-            if (code || hashHasToken) {
-                console.log('OAuth callback detected, code:', code, 'hash:', hashHasToken);
+            if (code) {
+                console.log('OAuth PKCE callback detected, code:', code);
                 
-                // Wait a moment for Supabase to process the callback
+                // Exchange the code for a session (PKCE flow)
+                const { data, error } = await supabaseClient.auth.exchangeCodeForSession(code);
+                console.log('Exchange result:', data, 'Error:', error);
+                
+                if (data?.session) {
+                    // Create profile if it doesn't exist (for OAuth users)
+                    await ensureProfile(data.session.user);
+                    // Clean URL and redirect
+                    window.history.replaceState({}, document.title, '/login');
+                    window.location.href = '/dashboard';
+                    return;
+                } else if (error) {
+                    console.error('Auth error:', error);
+                    showError('Login failed: ' + error.message);
+                }
+            } else if (hashHasToken) {
+                console.log('OAuth implicit flow callback detected');
+                
+                // Wait a moment for Supabase to process the hash
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 console.log('Session after callback:', session, 'Error:', error);
                 
                 if (session) {
-                    // Create profile if it doesn't exist (for OAuth users)
                     await ensureProfile(session.user);
                     window.location.href = '/dashboard';
                     return;
