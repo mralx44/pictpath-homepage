@@ -959,12 +959,33 @@
         
         async function loadTrips() {
             try {
-                // First try to load from trip_backups (backup data linked to auth user)
-                const { data: backupData, error: backupError } = await supabaseClient
-                    .from('trip_backups')
-                    .select('trips_data, backup_date, device_name')
-                    .eq('auth_user_id', currentUser.id)
-                    .single();
+                let backupData = null;
+                
+                // First try the RPC function that finds backups by email (supports multi-provider login)
+                if (currentUser.email) {
+                    const { data: rpcData, error: rpcError } = await supabaseClient
+                        .rpc('get_user_backups_by_email', { user_email_param: currentUser.email });
+                    
+                    if (!rpcError && rpcData && rpcData.length > 0) {
+                        // Use the most recent backup
+                        backupData = rpcData.sort((a, b) => 
+                            new Date(b.backup_date) - new Date(a.backup_date)
+                        )[0];
+                    }
+                }
+                
+                // Fallback: try direct query by auth_user_id
+                if (!backupData) {
+                    const { data: directData, error: directError } = await supabaseClient
+                        .from('trip_backups')
+                        .select('trips_data, backup_date, device_name')
+                        .eq('auth_user_id', currentUser.id)
+                        .single();
+                    
+                    if (!directError && directData) {
+                        backupData = directData;
+                    }
+                }
                 
                 if (backupData && backupData.trips_data && backupData.trips_data.length > 0) {
                     // Transform backup trips to match expected format
