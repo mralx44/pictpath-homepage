@@ -5,12 +5,16 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
   color: #0d4532;
   line-height: 1.6;
   background: #f5efe1;
-  overflow-x: hidden;
 }
 
 .container {
@@ -89,13 +93,23 @@ body {
 
 @media (max-width: 768px) {
   .main-nav {
-    padding: 12px 20px;
+    padding: 12px 15px;
+  }
+  .nav-logo span {
+    display: none;
+  }
+  .nav-logo img {
+    height: 32px;
   }
   .nav-menu {
-    gap: 15px;
+    gap: 10px;
   }
   .nav-menu a:not(.nav-login-btn) {
     display: none;
+  }
+  .nav-login-btn {
+    padding: 8px 16px !important;
+    font-size: 14px;
   }
 }
 
@@ -877,6 +891,15 @@ footer {
     border-left-width: 20px;
     border-right-width: 20px;
     border-bottom-width: 70px;
+  }
+  
+  .tree:nth-child(n+7) {
+    display: none;
+  }
+  
+  .forest {
+    gap: 6px;
+    padding: 0 10px;
   }
   
   .screenshot-placeholder {
