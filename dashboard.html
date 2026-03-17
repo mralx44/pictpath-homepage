@@ -970,11 +970,33 @@
                     console.log('RPC result:', rpcData, 'error:', rpcError);
                     
                     if (!rpcError && rpcData && rpcData.length > 0) {
-                        // Use the most recent backup
-                        backupData = rpcData.sort((a, b) => 
-                            new Date(b.backup_date) - new Date(a.backup_date)
-                        )[0];
-                        console.log('Found backup via RPC');
+                        // Merge trips from ALL backups (user may have multiple devices/providers)
+                        console.log('Found', rpcData.length, 'backup(s) via RPC');
+                        
+                        let allTrips = [];
+                        const seenTripIds = new Set();
+                        
+                        for (const backup of rpcData) {
+                            if (backup.trips_data && Array.isArray(backup.trips_data)) {
+                                for (const trip of backup.trips_data) {
+                                    // Avoid duplicates by trip ID
+                                    const tripId = trip.id || `${trip.name}_${trip.date}`;
+                                    if (!seenTripIds.has(tripId)) {
+                                        seenTripIds.add(tripId);
+                                        allTrips.push(trip);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        console.log('Merged total trips:', allTrips.length);
+                        
+                        // Create a synthetic backup with all trips
+                        backupData = {
+                            trips_data: allTrips,
+                            backup_date: rpcData[0].backup_date,
+                            device_name: 'Multiple devices'
+                        };
                     }
                 }
                 
