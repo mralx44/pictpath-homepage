@@ -960,31 +960,66 @@
         async function loadTrips() {
             try {
                 let backupData = null;
+                console.log('Loading trips for user:', currentUser.id, 'email:', currentUser.email);
                 
                 // First try the RPC function that finds backups by email (supports multi-provider login)
                 if (currentUser.email) {
                     const { data: rpcData, error: rpcError } = await supabaseClient
                         .rpc('get_user_backups_by_email', { user_email_param: currentUser.email });
                     
+                    console.log('RPC result:', rpcData, 'error:', rpcError);
+                    
                     if (!rpcError && rpcData && rpcData.length > 0) {
                         // Use the most recent backup
                         backupData = rpcData.sort((a, b) => 
                             new Date(b.backup_date) - new Date(a.backup_date)
                         )[0];
+                        console.log('Found backup via RPC');
                     }
                 }
                 
-                // Fallback: try direct query by auth_user_id
+                // Fallback 1: try direct query by auth_user_id
                 if (!backupData) {
+                    console.log('Trying fallback 1: auth_user_id query');
                     const { data: directData, error: directError } = await supabaseClient
                         .from('trip_backups')
-                        .select('trips_data, backup_date, device_name')
+                        .select('trips_data, backup_date, device_name, user_id, auth_user_id')
                         .eq('auth_user_id', currentUser.id)
                         .single();
+                    
+                    console.log('Fallback 1 result:', directData, 'error:', directError);
                     
                     if (!directError && directData) {
                         backupData = directData;
                     }
+                }
+                
+                // Fallback 2: try searching by user_email column directly
+                if (!backupData && currentUser.email) {
+                    console.log('Trying fallback 2: user_email column');
+                    const { data: emailData, error: emailError } = await supabaseClient
+                        .from('trip_backups')
+                        .select('trips_data, backup_date, device_name, user_id, auth_user_id')
+                        .eq('user_email', currentUser.email)
+                        .single();
+                    
+                    console.log('Fallback 2 result:', emailData, 'error:', emailError);
+                    
+                    if (!emailError && emailData) {
+                        backupData = emailData;
+                    }
+                }
+                
+                // Fallback 3: list ALL backups and let user see what's in the database
+                if (!backupData) {
+                    console.log('Trying fallback 3: listing recent backups');
+                    const { data: allBackups, error: allError } = await supabaseClient
+                        .from('trip_backups')
+                        .select('user_id, auth_user_id, user_email, backup_date, device_name')
+                        .order('backup_date', { ascending: false })
+                        .limit(10);
+                    
+                    console.log('All recent backups in database:', allBackups);
                 }
                 
                 if (backupData && backupData.trips_data && backupData.trips_data.length > 0) {
