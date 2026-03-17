@@ -384,20 +384,30 @@
             if (code) {
                 console.log('OAuth PKCE callback detected, code:', code);
                 
-                // Exchange the code for a session (PKCE flow)
-                const { data, error } = await supabaseClient.auth.exchangeCodeForSession(code);
-                console.log('Exchange result:', data, 'Error:', error);
-                
-                if (data?.session) {
-                    // Create profile if it doesn't exist (for OAuth users)
-                    await ensureProfile(data.session.user);
-                    // Clean URL and redirect
+                try {
+                    // For PKCE flow, Supabase auto-exchanges the code when we call getSession
+                    // after the redirect. The code verifier is stored in localStorage.
+                    const { data: { session }, error } = await supabaseClient.auth.getSession();
+                    console.log('Session after PKCE:', session, 'Error:', error);
+                    
+                    if (session) {
+                        await ensureProfile(session.user);
+                        // Clean URL and redirect
+                        window.history.replaceState({}, document.title, '/login');
+                        window.location.href = '/dashboard';
+                        return;
+                    } else if (error) {
+                        console.error('Auth error:', error);
+                        showError('Login failed: ' + error.message);
+                    } else {
+                        // No session and no error - code may have already been used
+                        // Clean URL and show login form
+                        window.history.replaceState({}, document.title, '/login');
+                    }
+                } catch (e) {
+                    console.error('PKCE exchange error:', e);
+                    showError('Login failed. Please try again.');
                     window.history.replaceState({}, document.title, '/login');
-                    window.location.href = '/dashboard';
-                    return;
-                } else if (error) {
-                    console.error('Auth error:', error);
-                    showError('Login failed: ' + error.message);
                 }
             } else if (hashHasToken) {
                 console.log('OAuth implicit flow callback detected');
