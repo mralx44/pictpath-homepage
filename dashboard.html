@@ -1790,6 +1790,16 @@
             <h2 id="groupDetailName">Group Name</h2>
             <p id="groupDetailDescription" style="color: rgba(245,239,225,0.7); margin-bottom: 20px;"></p>
             
+            <!-- Owner Actions -->
+            <div id="groupOwnerActions" style="display: none; margin-bottom: 20px;">
+                <button onclick="openEditGroupModal()" style="background: #f5efe1; color: #0d4532; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px;">
+                    ✏️ Edit Group
+                </button>
+                <button onclick="deleteGroup()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                    🗑️ Delete Group
+                </button>
+            </div>
+            
             <div class="group-members-section">
                 <h3>Members</h3>
                 <div id="groupMembersList" class="members-list">
@@ -1808,6 +1818,30 @@
             <div id="pendingInvitations" style="margin-top: 20px;">
                 <h3>Pending Invitations</h3>
                 <div id="pendingInvitationsList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Group Modal -->
+    <div id="editGroupModal" class="profile-modal" style="display: none;">
+        <div class="profile-modal-content" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeEditGroupModal()">&times;</button>
+            <h2>Edit Group</h2>
+            <div style="margin-top: 20px;">
+                <label style="display: block; color: #f5efe1; margin-bottom: 8px;">Group Name</label>
+                <input type="text" id="editGroupName" style="width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px;" />
+                
+                <label style="display: block; color: #f5efe1; margin-bottom: 8px;">Description</label>
+                <textarea id="editGroupDescription" rows="3" style="width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; resize: vertical;"></textarea>
+                
+                <label style="display: flex; align-items: center; color: #f5efe1; margin-bottom: 20px; cursor: pointer;">
+                    <input type="checkbox" id="editGroupPrivate" style="margin-right: 10px; width: 18px; height: 18px;" />
+                    Private group (invite only)
+                </label>
+                
+                <button onclick="saveGroupChanges()" style="background: #f5efe1; color: #0d4532; border: none; padding: 14px 30px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%;">
+                    Save Changes
+                </button>
             </div>
         </div>
     </div>
@@ -3078,6 +3112,10 @@
             document.getElementById('groupDetailName').textContent = group.name;
             document.getElementById('groupDetailDescription').textContent = group.description || '';
             
+            // Show owner actions (edit/delete) only for owners
+            document.getElementById('groupOwnerActions').style.display = 
+                group.role === 'owner' ? 'block' : 'none';
+            
             // Show invite section only for admins
             document.getElementById('inviteMemberSection').style.display = 
                 (group.role === 'admin' || group.role === 'owner') ? 'block' : 'none';
@@ -3094,6 +3132,101 @@
         function closeGroupDetailModal() {
             document.getElementById('groupDetailModal').style.display = 'none';
             selectedGroup = null;
+        }
+        
+        // ========================================
+        // EDIT & DELETE GROUP FUNCTIONS
+        // ========================================
+        
+        function openEditGroupModal() {
+            if (!selectedGroup) return;
+            
+            document.getElementById('editGroupName').value = selectedGroup.name;
+            document.getElementById('editGroupDescription').value = selectedGroup.description || '';
+            document.getElementById('editGroupPrivate').checked = !selectedGroup.is_public;
+            document.getElementById('editGroupModal').style.display = 'flex';
+        }
+        
+        function closeEditGroupModal() {
+            document.getElementById('editGroupModal').style.display = 'none';
+        }
+        
+        async function saveGroupChanges() {
+            if (!selectedGroup || !currentUser) return;
+            
+            const name = document.getElementById('editGroupName').value.trim();
+            const description = document.getElementById('editGroupDescription').value.trim();
+            const isPrivate = document.getElementById('editGroupPrivate').checked;
+            
+            if (!name) {
+                alert('Group name is required');
+                return;
+            }
+            
+            const { error } = await supabaseClient
+                .from('hiking_clubs')
+                .update({
+                    name: name,
+                    description: description,
+                    is_public: !isPrivate
+                })
+                .eq('id', selectedGroup.id)
+                .eq('owner_id', currentUser.id);
+            
+            if (error) {
+                console.error('Error updating group:', error);
+                alert('Failed to update group: ' + error.message);
+                return;
+            }
+            
+            closeEditGroupModal();
+            closeGroupDetailModal();
+            loadGroups();
+            alert('Group updated successfully!');
+        }
+        
+        async function deleteGroup() {
+            if (!selectedGroup || !currentUser) return;
+            
+            const confirmDelete = confirm(`Are you sure you want to delete "${selectedGroup.name}"? This action cannot be undone.`);
+            if (!confirmDelete) return;
+            
+            // Delete all members first
+            const { error: membersError } = await supabaseClient
+                .from('club_members')
+                .delete()
+                .eq('club_id', selectedGroup.id);
+            
+            if (membersError) {
+                console.error('Error deleting members:', membersError);
+            }
+            
+            // Delete all invitations
+            const { error: invitesError } = await supabaseClient
+                .from('club_invitations')
+                .delete()
+                .eq('club_id', selectedGroup.id);
+            
+            if (invitesError) {
+                console.error('Error deleting invitations:', invitesError);
+            }
+            
+            // Delete the group
+            const { error } = await supabaseClient
+                .from('hiking_clubs')
+                .delete()
+                .eq('id', selectedGroup.id)
+                .eq('owner_id', currentUser.id);
+            
+            if (error) {
+                console.error('Error deleting group:', error);
+                alert('Failed to delete group: ' + error.message);
+                return;
+            }
+            
+            closeGroupDetailModal();
+            loadGroups();
+            alert('Group deleted successfully!');
         }
         
         async function loadGroupMembers(groupId) {
