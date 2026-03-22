@@ -480,6 +480,109 @@ body {
   line-height: 1.7;
 }
 
+/* ===== HIKING GROUPS SECTION ===== */
+.hiking-groups {
+  background: linear-gradient(135deg, #0d4532 0%, #1a6b4a 100%);
+  padding: 100px 24px;
+  text-align: center;
+}
+
+.hiking-groups h2 {
+  color: #f5efe1;
+  font-size: 2.4rem;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  color: rgba(245, 239, 225, 0.8);
+  font-size: 1.2rem;
+  margin-bottom: 50px;
+}
+
+.groups-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
+
+.group-feature {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px 30px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s, background 0.3s;
+}
+
+.group-feature:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.group-feature-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.group-feature h3 {
+  color: #f5efe1;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.group-feature p {
+  color: rgba(245, 239, 225, 0.85);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.group-feature strong {
+  color: #FFD700;
+}
+
+.hashtag-example {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 30px 40px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hashtag-example h4 {
+  color: #f5efe1;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.hashtag-example code {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFD700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.hashtag-example p {
+  color: rgba(245, 239, 225, 0.9);
+  font-size: 0.95rem;
+}
+
+.example-result {
+  margin-top: 10px;
+  font-size: 1rem !important;
+}
+
+.example-result strong {
+  color: #FFD700;
+}
+
 /* ===== HOW IT WORKS SECTION ===== */
 .how-it-works {
   background: #f5efe1;
