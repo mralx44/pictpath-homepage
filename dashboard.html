@@ -1785,7 +1785,7 @@
 
     <!-- Group Detail Modal -->
     <div id="groupDetailModal" class="profile-modal" style="display: none;">
-        <div class="profile-modal-content" style="max-width: 600px;">
+        <div class="profile-modal-content" style="max-width: 700px;">
             <button class="modal-close" onclick="closeGroupDetailModal()">&times;</button>
             <h2 id="groupDetailName">Group Name</h2>
             <p id="groupDetailDescription" style="color: rgba(245,239,225,0.7); margin-bottom: 20px;"></p>
@@ -1800,8 +1800,19 @@
                 </button>
             </div>
             
+            <!-- Group Trips Section -->
+            <div class="group-trips-section" style="margin-bottom: 25px;">
+                <h3>🥾 Group Trips</h3>
+                <p style="color: rgba(245,239,225,0.5); font-size: 13px; margin-bottom: 15px;">
+                    Tip: Add #<span id="groupHashtagHint">GroupName</span> to your trip name when syncing to share it here.
+                </p>
+                <div id="groupTripsList" style="display: grid; gap: 12px; max-height: 300px; overflow-y: auto;">
+                    <!-- Trips will be loaded here -->
+                </div>
+            </div>
+            
             <div class="group-members-section">
-                <h3>Members</h3>
+                <h3>👥 Members</h3>
                 <div id="groupMembersList" class="members-list">
                     <!-- Members will be loaded here -->
                 </div>
@@ -3111,6 +3122,7 @@
             document.getElementById('groupDetailModal').style.display = 'flex';
             document.getElementById('groupDetailName').textContent = group.name;
             document.getElementById('groupDetailDescription').textContent = group.description || '';
+            document.getElementById('groupHashtagHint').textContent = group.name;
             
             // Show owner actions (edit/delete) only for owners
             document.getElementById('groupOwnerActions').style.display = 
@@ -3119,6 +3131,9 @@
             // Show invite section only for admins
             document.getElementById('inviteMemberSection').style.display = 
                 (group.role === 'admin' || group.role === 'owner') ? 'block' : 'none';
+            
+            // Load group trips
+            await loadGroupTrips(groupId);
             
             // Load members
             await loadGroupMembers(groupId);
@@ -3132,6 +3147,86 @@
         function closeGroupDetailModal() {
             document.getElementById('groupDetailModal').style.display = 'none';
             selectedGroup = null;
+        }
+        
+        // ========================================
+        // GROUP TRIPS FUNCTIONS
+        // ========================================
+        
+        async function loadGroupTrips(groupId) {
+            const container = document.getElementById('groupTripsList');
+            container.innerHTML = '<p style="color: rgba(245,239,225,0.5);">Loading trips...</p>';
+            
+            const { data: clubTrips, error } = await supabaseClient
+                .from('club_trips')
+                .select(`
+                    id,
+                    added_at,
+                    added_by,
+                    user_trips (
+                        id,
+                        trip_name,
+                        trip_date,
+                        distance_km,
+                        duration_seconds,
+                        photo_count,
+                        share_id
+                    ),
+                    profiles:added_by (
+                        username,
+                        avatar_url
+                    )
+                `)
+                .eq('club_id', groupId)
+                .order('added_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading group trips:', error);
+                container.innerHTML = '<p style="color: rgba(245,239,225,0.5);">No trips yet</p>';
+                return;
+            }
+            
+            if (!clubTrips || clubTrips.length === 0) {
+                container.innerHTML = '<p style="color: rgba(245,239,225,0.5);">No trips shared yet. Add #' + (selectedGroup?.name || 'GroupName') + ' to your trip name when syncing!</p>';
+                return;
+            }
+            
+            container.innerHTML = clubTrips.map(ct => {
+                const trip = ct.user_trips;
+                const profile = ct.profiles;
+                if (!trip) return '';
+                
+                const date = trip.trip_date ? new Date(trip.trip_date).toLocaleDateString('nb-NO') : '';
+                const distance = trip.distance_km ? trip.distance_km.toFixed(1) + ' km' : '';
+                const duration = trip.duration_seconds ? formatDuration(trip.duration_seconds) : '';
+                
+                return `
+                    <div class="group-trip-card" style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                                    ${profile?.avatar_url ? `<img src="${profile.avatar_url}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">` : (profile?.username?.[0]?.toUpperCase() || '?')}
+                                </div>
+                                <span style="color: rgba(245,239,225,0.7); font-size: 13px;">${escapeHtml(profile?.username || 'Unknown')}</span>
+                            </div>
+                            <h4 style="color: #f5efe1; margin: 0 0 5px 0; font-size: 15px;">${escapeHtml(trip.trip_name)}</h4>
+                            <div style="color: rgba(245,239,225,0.6); font-size: 13px;">
+                                ${date} ${distance ? '• ' + distance : ''} ${duration ? '• ' + duration : ''} ${trip.photo_count ? '• 📷 ' + trip.photo_count : ''}
+                            </div>
+                        </div>
+                        ${trip.share_id ? `<a href="/trip/${trip.share_id}" target="_blank" style="background: rgba(255,255,255,0.1); color: #f5efe1; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 13px;">View →</a>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) {
+                return `${hours}t ${minutes}m`;
+            }
+            return `${minutes}m`;
         }
         
         // ========================================
