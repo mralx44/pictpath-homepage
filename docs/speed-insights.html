@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speed Insights Guide - PictPath Documentation</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .docs-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      background: #f5efe1;
+      color: #0d4532;
+    }
+
+    .docs-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .docs-header h1 {
+      font-size: 2.5em;
+      color: #0d4532;
+      margin-bottom: 10px;
+    }
+
+    .docs-header p {
+      font-size: 1.1em;
+      color: #4a7c59;
+    }
+
+    .docs-content {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .docs-content h2 {
+      color: #0d4532;
+      font-size: 1.8em;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #e8d5b5;
+      padding-bottom: 10px;
+    }
+
+    .docs-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .docs-content h3 {
+      color: #4a7c59;
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .docs-content p {
+      margin-bottom: 15px;
+      line-height: 1.7;
+    }
+
+    .docs-content ul, .docs-content ol {
+      margin-left: 24px;
+      margin-bottom: 15px;
+    }
+
+    .docs-content li {
+      margin-bottom: 8px;
+    }
+
+    .docs-content code {
+      background: #f0ebe2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      color: #d65a6f;
+    }
+
+    .docs-content pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 15px 0;
+      line-height: 1.5;
+      font-size: 0.9em;
+    }
+
+    .docs-content pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .docs-content blockquote {
+      border-left: 4px solid #4a7c59;
+      padding-left: 16px;
+      margin-left: 0;
+      margin-bottom: 15px;
+      color: #4a7c59;
+      font-style: italic;
+    }
+
+    .docs-content a {
+      color: #4a7c59;
+      text-decoration: none;
+      border-bottom: 1px solid #4a7c59;
+    }
+
+    .docs-content a:hover {
+      color: #0d4532;
+      border-bottom-color: #0d4532;
+    }
+
+    .note {
+      background: #e8f4ec;
+      border-left: 4px solid #4a7c59;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .note strong {
+      color: #0d4532;
+    }
+
+    .toc {
+      background: #f0ebe2;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+    }
+
+    .toc ul {
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .toc a {
+      color: #4a7c59;
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #4a7c59;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: #0d4532;
+    }
+
+    .docs-nav {
+      background: #e8f4ec;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .docs-nav a {
+      display: inline-block;
+      margin: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="docs-container">
+    <a href="../index.html" class="back-link">← Back to Home</a>
+
+    <div class="docs-header">
+      <h1>Getting Started with Speed Insights</h1>
+      <p>Enable performance monitoring for your Vercel-deployed applications</p>
+    </div>
+
+    <div class="docs-content">
+      <div class="note">
+        <strong>💡 Note:</strong> This guide will help you get started with using Vercel Speed Insights on your project, showing you how to enable it, add the package to your project, deploy your app to Vercel, and view your data in the dashboard.
+      </div>
+
+      <h2>Prerequisites</h2>
+      <ul>
+        <li>A Vercel account. If you don't have one, you can <a href="https://vercel.com/signup">sign up for free</a>.</li>
+        <li>A Vercel project. If you don't have one, you can <a href="https://vercel.com/new">create a new project</a>.</li>
+        <li>The Vercel CLI installed. If you don't have it, you can install it using one of the commands below.</li>
+      </ul>
+
+      <h3>Install Vercel CLI</h3>
+      <pre><code># Using pnpm
+pnpm i vercel
+
+# Using yarn
+yarn i vercel
+
+# Using npm
+npm i vercel
+
+# Using bun
+bun i vercel</code></pre>
+
+      <h2>Step 1: Enable Speed Insights in Vercel</h2>
+      <p>
+        On the <a href="https://vercel.com/dashboard">Vercel dashboard</a>, select your Project followed by the <strong>Speed Insights</strong> tab. Then, select <strong>Enable</strong> from the dialog.
+      </p>
+      <div class="note">
+        <strong>💡 Note:</strong> Enabling Speed Insights will add new routes (scoped at <code>/_vercel/speed-insights/*</code>) after your next deployment.
+      </div>
+
+      <h2>Step 2: Add @vercel/speed-insights to Your Project</h2>
+      <p>Using the package manager of your choice, add the <code>@vercel/speed-insights</code> package to your project:</p>
+      <pre><code># Using pnpm
+pnpm i @vercel/speed-insights
+
+# Using yarn
+yarn i @vercel/speed-insights
+
+# Using npm
+npm i @vercel/speed-insights
+
+# Using bun
+bun i @vercel/speed-insights</code></pre>
+
+      <div class="note">
+        <strong>Note:</strong> When using the HTML implementation, there is no need to install the <code>@vercel/speed-insights</code> package.
+      </div>
+
+      <h2>Step 3: Add the SpeedInsights Component to Your App</h2>
+
+      <h3>For Next.js (Pages Router)</h3>
+      <p>The <code>SpeedInsights</code> component is a wrapper around the tracking script, offering seamless integration with Next.js.</p>
+      <p>Add the following component to your main app file:</p>
+      <pre><code>// pages/_app.tsx
+import type { AppProps } from 'next/app';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    &lt;&gt;
+      &lt;Component {...pageProps} /&gt;
+      &lt;SpeedInsights /&gt;
+    &lt;/&gt;
+  );
+}
+
+export default MyApp;</code></pre>
+
+      <p>For versions of Next.js older than 13.5, import from <code>@vercel/speed-insights/react</code>:</p>
+      <pre><code>// pages/example-component.tsx
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { useRouter } from "next/router";
+
+export default function Layout() {
+  const router = useRouter();
+
+  return &lt;SpeedInsights route={router.pathname} /&gt;;
+}</code></pre>
+
+      <h3>For Next.js (App Router)</h3>
+      <p>Add the following component to the root layout:</p>
+      <pre><code>// app/layout.tsx
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;html lang="en"&gt;
+      &lt;head&gt;
+        &lt;title&gt;Next.js&lt;/title&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+        {children}
+        &lt;SpeedInsights /&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+
+      <p>For older versions, create a dedicated component:</p>
+      <pre><code>// app/insights.tsx
+"use client";
+
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { usePathname } from "next/navigation";
+
+export function Insights() {
+  const pathname = usePathname();
+
+  return &lt;SpeedInsights route={pathname} /&gt;;
+}</code></pre>
+
+      <h3>For Create React App</h3>
+      <pre><code>// App.tsx
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
+export default function App() {
+  return (
+    &lt;div&gt;
+      {/* ... */}
+      &lt;SpeedInsights /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <h3>For Remix</h3>
+      <pre><code>// app/root.tsx
+import { SpeedInsights } from '@vercel/speed-insights/remix';
+
+export default function App() {
+  return (
+    &lt;html lang="en"&gt;
+      &lt;body&gt;
+        {/* ... */}
+        &lt;SpeedInsights /&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+
+      <h3>For SvelteKit</h3>
+      <pre><code>// src/routes/+layout.ts
+import { injectSpeedInsights } from "@vercel/speed-insights/sveltekit";
+
+injectSpeedInsights();</code></pre>
+
+      <h3>For HTML</h3>
+      <p>Add the following scripts before the closing <code>&lt;/body&gt;</code> tag:</p>
+      <pre><code>&lt;script&gt;
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+&lt;/script&gt;
+&lt;script defer src="/_vercel/speed-insights/script.js"&gt;&lt;/script&gt;</code></pre>
+
+      <h3>For Vue</h3>
+      <pre><code>&lt;!-- src/App.vue --&gt;
+&lt;script setup lang="ts"&gt;
+import { SpeedInsights } from '@vercel/speed-insights/vue';
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;SpeedInsights /&gt;
+&lt;/template&gt;</code></pre>
+
+      <h3>For Nuxt</h3>
+      <pre><code>&lt;!-- layouts/default.vue --&gt;
+&lt;script setup lang="ts"&gt;
+import { SpeedInsights } from '@vercel/speed-insights/vue';
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;SpeedInsights /&gt;
+&lt;/template&gt;</code></pre>
+
+      <h3>For Other Frameworks</h3>
+      <pre><code>// main.ts
+import { injectSpeedInsights } from "@vercel/speed-insights";
+
+injectSpeedInsights();</code></pre>
+
+      <h3>For Astro</h3>
+      <p>Declare the <code>&lt;SpeedInsights /&gt;</code> component in a layout component:</p>
+      <pre><code>---
+import SpeedInsights from '@vercel/speed-insights/astro';
+const { title, description } = Astro.props;
+---
+&lt;title&gt;{title}&lt;/title&gt;
+&lt;meta name="title" content={title} /&gt;
+&lt;meta name="description" content={description} /&gt;
+
+&lt;SpeedInsights /&gt;</code></pre>
+
+      <p>Optionally, add a <code>beforeSend</code> function to filter sensitive data:</p>
+      <pre><code>---
+import SpeedInsights from '@vercel/speed-insights/astro';
+const { title, description } = Astro.props;
+---
+&lt;title&gt;{title}&lt;/title&gt;
+&lt;meta name="title" content={title} /&gt;
+&lt;meta name="description" content={description} /&gt;
+
+&lt;script is:inline&gt;
+  function speedInsightsBeforeSend(data){
+    console.log("Speed Insights before send", data)
+    return data;
+  }
+&lt;/script&gt;
+&lt;SpeedInsights /&gt;</code></pre>
+
+      <h2>Step 4: Deploy Your App to Vercel</h2>
+      <p>You can deploy your app to Vercel's global CDN by running:</p>
+      <pre><code>vercel deploy</code></pre>
+
+      <p>Alternatively, <a href="https://vercel.com/docs/git#deploying-a-git-repository">connect your project's git repository</a> to enable automatic deployments.</p>
+
+      <div class="note">
+        <strong>💡 Note:</strong> If everything is set up correctly, you should be able to find the <code>/_vercel/speed-insights/script.js</code> script inside the body tag of your page.
+      </div>
+
+      <h2>Step 5: View Your Data in the Dashboard</h2>
+      <p>
+        Once your app is deployed and users have visited your site, you can view the data in the <a href="https://vercel.com/dashboard">Vercel dashboard</a>.
+      </p>
+      <p>After a few days of visitors, you'll be able to start exploring your metrics.</p>
+
+      <h2>Learn More</h2>
+      <p>Now that you have Vercel Speed Insights set up, explore these topics to learn more:</p>
+      <ul>
+        <li><a href="https://vercel.com/docs/speed-insights/package">Learn how to use the @vercel/speed-insights package</a></li>
+        <li><a href="https://vercel.com/docs/speed-insights/metrics">Learn about metrics</a></li>
+        <li><a href="https://vercel.com/docs/speed-insights/privacy-policy">Read about privacy and compliance</a></li>
+        <li><a href="https://vercel.com/docs/speed-insights/limits-and-pricing">Explore pricing</a></li>
+        <li><a href="https://vercel.com/docs/speed-insights/troubleshooting">Troubleshooting</a></li>
+      </ul>
+
+      <div class="docs-nav">
+        <a href="../index.html">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
